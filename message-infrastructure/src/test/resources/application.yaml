@@ -1,0 +1,23 @@
+spring:
+    datasource:
+        driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+        url: jdbc:shardingsphere:classpath:shardingsphere-config-mock.yaml
+    threads:
+        virtual:
+            enabled: true
+
+    jpa:
+        # 是否在控制台打印 SQL 语句
+        show-sql: false
+        properties:
+            hibernate:
+                # 格式化打印出的 SQL
+                format_sql: true
+                # 针对 Hibernate 6+ 的一些优化（可选）
+                highlight_sql: true
+        hibernate:
+            # 自动更新数据库表结构（生产环境建议设置为 none 或 validate）
+            ddl-auto: none
+        generate-ddl: false
+        # 延迟初始化，加快启动速度
+        open-in-view: false

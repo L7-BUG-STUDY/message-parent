@@ -1,6 +1,7 @@
 package com.l7bug.message.domain.email;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * EmailType
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
  * @since 2025/12/23 12:29
  */
 @AllArgsConstructor
+@Getter
 public enum EmailType {
 	/**
 	 * 企业微信

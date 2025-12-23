@@ -1,5 +1,7 @@
 package com.l7bug.message.domain.email;
 
+import java.util.Optional;
+
 /**
  * EmailGateway
  *
@@ -7,5 +9,7 @@ package com.l7bug.message.domain.email;
  * @since 2025/12/23 14:14
  */
 public interface EmailConfigGateway {
-	boolean valid(EmailConfig emailConfig);
+	boolean testConnection(EmailConfig emailConfig);
+
+	Optional<EmailConfig> findById(Long id);
 }

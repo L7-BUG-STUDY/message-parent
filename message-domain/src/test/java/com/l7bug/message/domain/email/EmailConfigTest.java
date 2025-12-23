@@ -14,9 +14,9 @@ class EmailConfigTest {
 	}
 
 	@Test
-	void valid() {
+	void testConnection() {
 		EmailConfig emailConfig = new EmailConfig(emailConfigGateway);
-		Assertions.assertThat(emailConfig.valid())
+		Assertions.assertThat(emailConfig.testConnection())
 			.isFalse()
 		;
 	}

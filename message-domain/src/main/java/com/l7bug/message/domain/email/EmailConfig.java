@@ -18,8 +18,9 @@ public class EmailConfig {
 	private EmailType type;
 	private String username;
 	private String password;
+	private Boolean connection = false;
 
-	public boolean valid() {
-		return emailConfigGateway.valid(this);
+	public boolean testConnection() {
+		return emailConfigGateway.testConnection(this);
 	}
 }
