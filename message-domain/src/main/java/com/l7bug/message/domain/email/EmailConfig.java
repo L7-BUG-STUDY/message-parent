@@ -26,7 +26,14 @@ public class EmailConfig {
 	private Boolean connection = false;
 
 	public String testConnection() {
-		return emailConfigGateway.testConnection(this);
+		String s = emailConfigGateway.testConnection(this);
+		this.setConnection(s.isEmpty());
+		this.save();
+		return s;
+	}
+
+	public boolean save() {
+		return this.getEmailConfigGateway().save(this);
 	}
 
 	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, String... to) {

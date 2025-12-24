@@ -2,6 +2,7 @@ package com.l7bug.message.infrastructure.gateway;
 
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailConfigGateway;
+import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
 import jakarta.mail.MessagingException;
@@ -55,13 +56,27 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	}
 
 	@Override
+	public boolean save(EmailConfig emailConfig) {
+		EmailConfigDo emailConfigDo = emailConfigDoMapstruct.mapDo(emailConfig);
+		this.emailConfigRepository.save(emailConfigDo);
+		emailConfig.setId(emailConfigDo.getId());
+		return true;
+	}
+
+
+	@Override
 	public String testConnection(EmailConfig emailConfig) {
+		// 构建邮件发送器
 		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
 		try {
+			// 测试连接
 			javaMailSender.testConnection();
+			// 连接成功返回空字符串
 			return "";
 		} catch (MessagingException e) {
+			// 记录连接失败的错误日志
 			log.error("邮件服务连接失败,原因", e);
+			// 连接失败返回错误信息
 			return e.getMessage();
 		}
 	}

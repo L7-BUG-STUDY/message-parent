@@ -11,6 +11,20 @@ import java.util.Optional;
  * @since 2025/12/23 14:14
  */
 public interface EmailConfigGateway {
+	/**
+	 * 保存邮件配置
+	 *
+	 * @param emailConfig 邮件配置对象
+	 * @return 保存成功返回true，否则返回false
+	 */
+	boolean save(EmailConfig emailConfig);
+
+	/**
+	 * 测试邮件配置连接
+	 *
+	 * @param emailConfig 邮件配置对象，包含SMTP服务器、用户名、密码等信息
+	 * @return 连接成功时返回空字符串，连接失败时返回错误信息
+	 */
 	String testConnection(EmailConfig emailConfig);
 
 	/**
