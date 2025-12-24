@@ -48,18 +48,19 @@ class EmailConfigGatewayImplTest {
 			return;
 		}
 		EmailConfig emailConfig = byId.get();
-		try (InputStream resourceAsStream = this.getClass().getResourceAsStream("/testEmail.html");) {
+		try (InputStream resourceAsStream = this.getClass().getResourceAsStream("/testEmail.html"); InputStream log = this.getClass().getResourceAsStream("/test.txt");) {
 			if (resourceAsStream == null) {
 				return;
 			}
-			InputStream log = this.getClass().getResourceAsStream("/test.txt");
 			if (log == null) {
 				return;
 			}
-			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(resourceAsStream.readAllBytes());
-			String content = new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8);
-			boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", byteArrayInputStream), "ll789y@gmail.com", "1411205284@qq.com");
-			assertThat(b).isTrue();
+			byte[] htmlBytes = resourceAsStream.readAllBytes();
+			try (ByteArrayInputStream htmlByteArrayIS = new ByteArrayInputStream(htmlBytes)) {
+				String content = new String(htmlBytes, StandardCharsets.UTF_8);
+				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS), "ll789y@gmail.com", "1411205284@qq.com");
+				assertThat(b).isTrue();
+			}
 		}
 	}
 

@@ -14,10 +14,15 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * MailConfigGateway
@@ -87,14 +92,21 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 		if (!files.isEmpty()) {
 			// 4. 添加附件
-			for (Map.Entry<String, InputStream> entry : files.entrySet()) {
-				String fileName = entry.getKey();
-				InputStream is = entry.getValue();
-				// 将 InputStream 转换为 ByteArrayResource，确保数据可以被多次读取且不会因流关闭报错
-				ByteArrayResource resource = new ByteArrayResource(is.readAllBytes());
-				// 对文件名进行编码，防止中文乱码
-				String encodedFileName = MimeUtility.encodeText(fileName);
-				helper.addAttachment(encodedFileName, resource);
+			try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
+				for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+					String fileName = entry.getKey();
+					InputStream is = entry.getValue();
+					try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(is.readAllBytes())) {
+						ZipEntry zipEntry = new ZipEntry(fileName);
+						zipOutputStream.putNextEntry(zipEntry);
+						byteArrayInputStream.transferTo(zipOutputStream);
+						zipOutputStream.closeEntry();
+					}
+				}
+				zipOutputStream.finish();
+				String encodedFileName = MimeUtility.encodeText("attachments.zip");
+				helper.addAttachment(encodedFileName, new ByteArrayResource(byteArrayOutputStream.toByteArray()));
 			}
 		}
 
