@@ -29,11 +29,13 @@ class EmailConfigGatewayImplTest {
 			return;
 		}
 		EmailConfig emailConfig = byId.get();
-		String b = emailConfig.testConnection();
-		assertThat(b).isEmpty();
+		String password = emailConfig.getPassword();
 		emailConfig.setPassword("123321");
 		assertThat(emailConfig.testConnection()).isNotEmpty();
-
+		assertThat(emailConfig.getConnection()).isFalse();
+		emailConfig.setPassword(password);
+		assertThat(emailConfig.testConnection()).isEmpty();
+		assertThat(emailConfig.getConnection()).isTrue();
 		byId = this.emailConfigGateway.findById(UUID.randomUUID().getMostSignificantBits());
 		assertThat(byId).isNotNull()
 			.isEmpty();
