@@ -1,0 +1,903 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<html dir="ltr" lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Airline</title>
+    <!--[if !mso]>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<![endif]-->
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <meta content="NOINDEX, NOFOLLOW" name="ROBOTS"/>
+
+    <style type="text/css">
+        @media {
+            @font-face {
+                font-family: SourceSans-Bold;
+                src: url('https://upgrade-prod-cdn.plusgrade.com/offer/fonts/source-sans/SourceSansPro-Bold.otf');
+                font-weight: bold;
+                font-style: normal;
+            }
+            @font-face {
+                font-family: SourceSans;
+                src: url('https://upgrade-prod-cdn.plusgrade.com/offer/fonts/source-sans/SourceSansPro-Regular.otf'),
+                url('https://upgrade-prod-cdn.plusgrade.com/offer/fonts/source-sans/SourceSansPro-Regular.woff') format('woff'),
+                url('https://upgrade-prod-cdn.plusgrade.com/offer/fonts/source-sans/SourceSansPro-Regular.ttf') format('truetype');
+                font-weight: normal;
+                font-style: normal;
+            }
+            @font-face {
+                font-family: Varela Round;
+                src: url('https://upgrade-prod-cdn.plusgrade.com/offer/fonts/varela/Varela-Regular.otf');
+                font-weight: normal;
+                font-style: normal;
+            }
+        }
+
+        #outlook a {
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+
+        p {
+            display: block;
+            margin: 13px 0;
+        }
+    </style>
+    <!--[if mso]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:AllowPNG></o:AllowPNG>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    <!--[if lte mso 11]>
+    <style type="text/css">
+        .mj-outlook-group-fix {
+            width: 100% !important;
+        }
+    </style>
+    <![endif]-->
+    <!--[if !mso]><!-->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500"
+          rel="stylesheet" type="text/css">
+    <style type="text/css">
+        @import url(https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500);
+    </style>
+    <!--<![endif]-->
+    <style type="text/css">
+        @media only screen and (min-width: 480px) {
+            .mj-column-per-100 {
+                width: 100% !important;
+                max-width: 100%;
+            }
+
+            .mj-column-per-50 {
+                width: 49.5% !important;
+                max-width: 49.5%;
+            }
+        }
+    </style>
+    <style type="text/css">
+        noinput.mj-menu-checkbox {
+            display: block !important;
+            max-height: none !important;
+            visibility: visible !important;
+        }
+
+        @media only screen and (max-width: 480px) {
+            .mj-menu-checkbox[type="checkbox"] ~ .mj-inline-links {
+                display: none !important;
+            }
+
+            .mj-menu-checkbox[type="checkbox"]:checked ~ .mj-inline-links,
+            .mj-menu-checkbox[type="checkbox"] ~ .mj-menu-trigger {
+                display: block !important;
+                max-width: none !important;
+                max-height: none !important;
+                font-size: inherit !important;
+            }
+
+            .mj-menu-checkbox[type="checkbox"] ~ .mj-inline-links > a {
+                display: block !important;
+            }
+
+            .mj-menu-checkbox[type="checkbox"]:checked ~ .mj-menu-trigger .mj-menu-icon-close {
+                display: block !important;
+            }
+
+            .mj-menu-checkbox[type="checkbox"]:checked ~ .mj-menu-trigger .mj-menu-icon-open {
+                display: none !important;
+            }
+        }
+
+        @media only screen and (max-width: 480px) {
+            table.mj-full-width-mobile {
+                width: 100% !important;
+            }
+
+            td.mj-full-width-mobile {
+                width: auto !important;
+            }
+        }
+    </style>
+    <style type="text/css">
+        @media all and (max-width: 480px) {
+        }
+
+
+        .highlight {
+            font-weight: 600;
+            color: #000;
+        }
+
+        .flight-row {
+            background-color: #F2F2F2;
+            border-collapse: separate;
+            border: 2px solid #ffffff;
+        }
+
+        .flight-departure-date {
+            font-family: Arial, Helvetica, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #000000;;
+        }
+
+        .flight-details {
+            font-style: normal;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 22px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1A1A1A;
+            align-content: center;
+            align-items: center;;
+        }
+
+        a {
+            text-decoration: none;
+            color: #00803E !important;
+        }
+
+        .preheader {
+            display: none !important;
+            color: transparent;
+            height: 0;
+            max-height: 0;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            mso-hide: all;
+            visibility: hidden;
+            width: 0;
+        }
+    </style>
+    <script type="application/ld+json">
+
+
+    </script>
+</head>
+<body style="background-color:#F2F2F6"><span class="preheader">Important details about your upcoming flight.&zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj; &zwnj;</span>
+<div style="background-color:#F2F2F6">
+    <!--[if mso | IE]>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600">
+        <tr>
+            <td style="line-height:0px;mso-line-height-rule:exactly;">
+    <![endif]-->
+    <div style="background:#F2F2F6;background-color:#F2F2F6;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+               style="background:#F2F2F6;background-color:#F2F2F6;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;padding:0px;text-align:center;">
+                    <!--[if mso | IE]>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="" style="vertical-align:top;width:300px;">
+                    <![endif]-->
+                    <div class="mj-column-per-50 mj-outlook-group-fix"
+                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="vertical-align:top;" width="100%">
+                            <tr>
+                                <td align="left" style="padding:10px 25px;word-break:break-word;"
+                                    vertical-align="middle">
+                                    <div
+                                        style="font-family:Arial, Helvetica, sans-serif;line-height:24px;text-align:left;font-size:11px;font-style:normal;font-weight:300;text-decoration:none;">
+                                        <a href="https://go.plusgrade.com/ss/c/u001.nYk9EkIyg-CDw8CIfF-3roMDLk9msF78JlbbG5pesYmzqoTdi0976t77CjoHSBcZyRYKSvumGUOs7vcYgUMzOvUx5mHRTRowIhrtd-W8rcv502RoWyRnCSwigUwzVOQryNZY8BsSAlThl94lZHP0dOcq0IYgT0s8A7kbNQvSsbzNctzvv3g14LEwvwwbfAwx5_3zzu6oXIG1OqKe7XaHu3RST6qpojPgkiIF0sTGAURaUFEXWs19xXB5KFqvq_Cd4KWVR6SV0XqgdPHVS394e5CbAH87XEIQLmRvURwswIAcTv4AgQg0sAxSprp2tX2qm6YlreozRwpdC7a2Jqx5Dzz5EHgzE06YdciRq94Ta00/4mo/WFcVBaJYTi-IsrZrwtijZA/h0/h001.6qNijcV7qMWTit6ILEuQ3I5nfpbViXyfdxzHEI5TCEo">View
+                                            in browser</a></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    <td class="" style="vertical-align:top;width:300px;">
+                    <![endif]-->
+                    <div class="mj-column-per-50 mj-outlook-group-fix"
+                         style="text-align:right;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="vertical-align:top;" width="100%">
+                            <tr>
+                                <td align="right" style="word-break:break-word;">
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    <![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]>
+    </td>
+    </tr>
+    </table>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600">
+        <tr>
+            <td style="line-height:0px;mso-line-height-rule:exactly;">
+    <![endif]-->
+    <div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+               style="background:#ffffff;background-color:#ffffff;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;padding:0px 0;text-align:center;">
+                    <!--[if mso | IE]>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="" width="600px">
+                                <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                       style="width:600px;" width="600">
+                                    <tr>
+                                        <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="font-size:0;line-height:0;text-align:left;display:inline-block;width:100%;direction:ltr">
+                                        <!--[if mso | IE]>
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                            <tr>
+                                                <td style="vertical-align:top;width:300px;">
+                                        <![endif]-->
+                                        <div class="mj-column-per-50 mj-outlook-group-fix"
+                                             style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:50%;">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                                   style="vertical-align:top;" width="100%">
+                                                <tr>
+                                                    <td align="left"
+                                                        style="padding:10px 25px;padding-top:0;padding-left:0;word-break:break-word;">
+                                                        <table border="0" cellpadding="0" cellspacing="0"
+                                                               role="presentation"
+                                                               style="border-collapse:collapse;border-spacing:0px;">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td style="width:275px;">
+                                                                    <a href="https://go.plusgrade.com/ss/c/u001.7-nFDS61gfCbrfR018Y3HWIx1_tGEwzq2uvpXuh-Rq7XViH6ORnQZtWQEO9S7S5bU03TWcMFKEFkPWgCn_UBFkuIbsOJO6owcKBMO6wuJ4t3b1YLF4oCAOPywCMA8zQuHLXxgODgCw9Vz7yjl9lfR8JW-mtqyLm85vCZ8cAexrjDc-9Ds_M6LAKgD7SNJL5RZS-HX4qxK2f452d2EX527qGaqdQYzJOI0xXRHzAQPFLRA78Q4UD3niDnIEtaRTQH/4mo/WFcVBaJYTi-IsrZrwtijZA/h1/h001.uR0-lRBd7IrdGFQ3IM88wjJqGvbOHDcXbt33Vedqor4"
+                                                                       style="text-decoration: none;" target="_blank">
+                                                                        <img alt="airline logo" height="auto"
+                                                                             src="https://upgrade-prod-cdn.plusgrade.com/offer/pid/y1u3muiXSV/email/Extra_seat_logoV2.png"
+                                                                             style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;padding:10px 0 15px 20px; width: 87%;"
+                                                                             width="275"/>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <!--[if mso | IE]>
+                                        </td>
+                                        <td style="vertical-align:top;width:300px;">
+                                        <![endif]-->
+
+                                        <!--[if mso | IE]>
+                                        </td>
+                                        </tr>
+                                        </table>
+                                        <![endif]-->
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="" width="600px">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                   style="width:600px;" width="600">
+                                <tr>
+                                    <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="vertical-align:top;width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                               style="vertical-align:top;" width="100%">
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:0 25px 10px;padding-right:0;padding-left:0;word-break:break-word;">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                           role="presentation"
+                                                           style="border-collapse:collapse;border-spacing:0px;">
+                                                        <tbody>
+                                                        <tr>
+                                                            <td style="width:600px;">
+                                                                <a href="https://go.plusgrade.com/ss/c/u001.7-nFDS61gfCbrfR018Y3HWIx1_tGEwzq2uvpXuh-Rq7XViH6ORnQZtWQEO9S7S5bU03TWcMFKEFkPWgCn_UBFkuIbsOJO6owcKBMO6wuJ4t3b1YLF4oCAOPywCMA8zQuHLXxgODgCw9Vz7yjl9lfRwjXe1JvUXNmmRfOme30eF4KJebpDfyzFdyCf1zTlU-E4hkg1LQa2dGw10LQJculDnNLXhE9VkWdEibd_3ZkJ2CFL1dV29PCPvCVpWHcq4de/4mo/WFcVBaJYTi-IsrZrwtijZA/h2/h001.kkX1487EHlXoNOR93Ke27WKTJ5FKY5qK3ifgSXxKtkA"
+                                                                   style="text-decoration: none;" target="_blank">
+                                                                    <img alt="Hero Image" height="auto"
+                                                                         src="https://upgrade-prod-cdn.plusgrade.com/offer/pid/y1u3muiXSV/email/DSB-HERO-01.jpg"
+                                                                         style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;"
+                                                                         width="600"/>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="" width="600px">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                   style="width:600px;" width="600">
+                                <tr>
+                                    <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="vertical-align:top;width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                               style="vertical-align:top;" width="100%">
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;line-height:38px;text-align:left;font-size:18px;font-weight:500;color:#000000;">
+                                                        Dear Guests,
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:8px;padding-bottom:0;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;line-height:38px;text-align:left;font-size:30px;font-weight:500;color:#000000;">
+                                                        Buy Seat+ and travel with no one next to you!
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:8px;padding-bottom:0px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;line-height:24px;text-align:left;font-size:17px;font-weight:400;color:#1A1A1A">
+                                                        Did you know that you can <span
+                                                        style="color: #037390 !important">own the whole row</span> on
+                                                        your next flight.
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td align="left" style="padding:10px 25px;padding-bottom:20px;word-break:break-word;"
+                                                    vertical-align="middle">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                           role="presentation"
+                                                           style="border-collapse:separate;line-height:100%;">
+                                                        <tr>
+                                                            <td align="center" bgcolor="#00803E" role="presentation"
+                                                                style="border:none;border-radius:5px;cursor:auto;mso-padding-alt:15px 30px;background:#00803E"
+                                                                valign="middle">
+                                                                <a href="https://go.plusgrade.com/ss/c/u001.7-nFDS61gfCbrfR018Y3HWIx1_tGEwzq2uvpXuh-Rq7XViH6ORnQZtWQEO9S7S5bU03TWcMFKEFkPWgCn_UBFkuIbsOJO6owcKBMO6wuJ4t3b1YLF4oCAOPywCMA8zQuHLXxgODgCw9Vz7yjl9lfRyzXscBMff6tp90xvkt7gIeXGH2TFIHAPE1QecpVsRgEXd0vd17emyQ-iIDfCbU_JqlmZvEGRIh-k_ApMu6eL_XMU9AJLvsYwwZIVQ4bFqNEzjBH3J9JRA0hBtZbgK2P3Q/4mo/WFcVBaJYTi-IsrZrwtijZA/h3/h001.aeoEUl9rMJwD7c0okVR85qou4kIaYl9abFkWleTaMFE"
+                                                                   style="display:inline-block;background:#00803E;font-family:Arial, Helvetica, sans-serif;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:15px 30px;mso-padding-alt:0px;border-radius:5px;color:#ffffff;font-size:18px;font-weight:500;"
+                                                                   target="_blank">
+                                                                    <span
+                                                                        style="text-decoration:none;color:#ffffff;font-size:18px;font-weight:500;;font-family:Arial, Helvetica, sans-serif">Purchase now</span>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="" width="600px">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                   style="width:600px;" width="600">
+                                <tr>
+                                    <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="vertical-align:top;width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                               style="vertical-align:top;" width="100%">
+                                            <tr>
+                                                <td align="left" style="padding:10px 25px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:18px;font-weight:500;color:#000000;;line-height:40px;text-align:left">
+                                                        What is Seat+?
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:0px;padding-bottom:0;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:18px;font-weight:400;color:#000000;;line-height:24px;text-align:left">
+                                                        Take advantage of our new service - Seat+ - which allows you to
+                                                        purchase one or more empty seats next to you in Economy Class,
+                                                        ensuring a stress free experience.
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:18px;font-weight:400;color:#000000;;line-height:24px;text-align:left">
+                                                        <ul style="list-style-type: none; margin-top: 17px; padding: 0px 8px 0px 8px;">
+                                                            <li style="padding:8px;"><i
+                                                                style="padding: 0 15px 0 15px; background: url(https://upgrade-prod-cdn.plusgrade.com/offer/pid/y1u3muiXSV/email/Extra_seat_checkmarkV2.png) no-repeat center"></i>
+                                                                Maintain social distance
+                                                            </li>
+                                                            <li style="padding:8px;"><i
+                                                                style="padding: 0 15px 0 15px; background: url(https://upgrade-prod-cdn.plusgrade.com/offer/pid/y1u3muiXSV/email/Extra_seat_checkmarkV2.png) no-repeat center"></i>
+                                                                Extra comfort
+                                                            </li>
+                                                            <li style="padding:8px;"><i
+                                                                style="padding: 0 15px 0 15px; background: url(https://upgrade-prod-cdn.plusgrade.com/offer/pid/y1u3muiXSV/email/Extra_seat_checkmarkV2.png) no-repeat center"></i>
+                                                                More personal space
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td align="left" style="padding:10px 25px;padding-top:9px;padding-bottom:20px;word-break:break-word;"
+                                                    vertical-align="middle">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                           role="presentation"
+                                                           style="border-collapse:separate;line-height:100%;">
+                                                        <tr>
+                                                            <td align="center" bgcolor="#00803E" role="presentation"
+                                                                style="border:none;border-radius:5px;cursor:auto;mso-padding-alt:15px 30px;background:#00803E"
+                                                                valign="middle">
+                                                                <a href="https://go.plusgrade.com/ss/c/u001.7-nFDS61gfCbrfR018Y3HWIx1_tGEwzq2uvpXuh-Rq7XViH6ORnQZtWQEO9S7S5bU03TWcMFKEFkPWgCn_UBFkuIbsOJO6owcKBMO6wuJ4t3b1YLF4oCAOPywCMA8zQuHLXxgODgCw9Vz7yjl9lfRyzXscBMff6tp90xvkt7gIei2rkWoEu1DpvB8pSjOOMgrtNyoocnKXeDaIOm00VrgAeoQYj5v5AOILvn7p1hzKmhjYWK06mx7dNtq-PXmvhky8EFSqrGoVrH7zBbjYvDUw/4mo/WFcVBaJYTi-IsrZrwtijZA/h4/h001.BKMjsF-fl6BBxIjj9tbgMz-BXVmHdDY46fHIVF6SN9k"
+                                                                   style="display:inline-block;background:#00803E;font-family:Arial, Helvetica, sans-serif;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:15px 30px;mso-padding-alt:0px;border-radius:5px;color:#ffffff;font-size:18px;font-weight:500;"
+                                                                   target="_blank">
+                                          <span
+                                              style="text-decoration:none;color:#ffffff;font-size:18px;font-weight:500;;font-family:Arial, Helvetica, sans-serif">
+                                            Explore my seating options
+                                          </span>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:18px;font-weight:400;color:#000000;;line-height:24px;text-align:left">
+                                                        &nbsp;
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:10px 25px;padding-right:0;padding-left:0;word-break:break-word;">
+                                                    <p style="border-top:solid 1px #F2F2F6;font-size:1px;margin:0px auto;width:100%;">
+                                                    </p>
+                                                    <!--[if mso | IE]>
+                                                            <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px #F2F2F6;font-size:1px;margin:0px auto;width:600px;" role="presentation" width="600px">
+                                                              <tr>
+                                                                <td style="height:0;line-height:0;">
+                                                                  &nbsp;
+                                                                </td>
+                                                              </tr>
+                                                            </table>
+                                                    <![endif]-->
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="" width="600px">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                   style="width:600px;" width="600">
+                                <tr>
+                                    <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="vertical-align:top;width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="text-align:left;direction:ltr;;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                               style="vertical-align:top;" width="100%">
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:32px;padding-bottom:0px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:18px;font-weight:500;color:#000000;;line-height:26px;text-align:left">
+                                                        Seat+ is available on these flight(s)
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:0;padding-bottom:24px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;font-size:14px;font-weight:300;color:#1A1A1A;line-height:24px;text-align:left">
+                                                        Booking reference: A9TUGH
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" style="padding:10px 25px;word-break:break-word;">
+                                                    <table border="0" cellpadding="12px" cellspacing="0" style="color:#000000;font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;"
+                                                           width="100%">
+
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td align="left" style="padding:10px 25px;padding-top:9px;padding-bottom:20px;word-break:break-word;"
+                                                    vertical-align="middle">
+                                                    <table border="0" cellpadding="0" cellspacing="0"
+                                                           role="presentation"
+                                                           style="border-collapse:separate;line-height:100%;">
+                                                        <tr>
+                                                            <td align="center" bgcolor="#00803E" role="presentation"
+                                                                style="border:none;border-radius:5px;cursor:auto;mso-padding-alt:15px 30px;background:#00803E"
+                                                                valign="middle">
+                                                                <a href="https://go.plusgrade.com/ss/c/u001.7-nFDS61gfCbrfR018Y3HWIx1_tGEwzq2uvpXuh-Rq7XViH6ORnQZtWQEO9S7S5bU03TWcMFKEFkPWgCn_UBFkuIbsOJO6owcKBMO6wuJ4t3b1YLF4oCAOPywCMA8zQuHLXxgODgCw9Vz7yjl9lfRyzXscBMff6tp90xvkt7gIcOwhfTRWWIlQUcTP7W7Tefc2YyafY7hDfJJItM9aoiDV-lg6zHfiDSipHC9OgrmSniHpL5tLhoLuSZmHjixd_LBUr-XoERux6PH3BqUsxXXA/4mo/WFcVBaJYTi-IsrZrwtijZA/h5/h001.A0bPRRJOJMEwA-sPklEbsWXp_qm1ntIT3AWWEtb5Fdg"
+                                                                   style="display:inline-block;background:#00803E;font-family:Arial, Helvetica, sans-serif;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:15px 30px;mso-padding-alt:0px;border-radius:5px;color:#ffffff;font-size:18px;font-weight:500;"
+                                                                   target="_blank">
+                                          <span
+                                              style="text-decoration:none;color:#ffffff;font-size:18px;font-weight:500;;font-family:Arial, Helvetica, sans-serif">
+                                            Get Seat+ on my next flight
+                                          </span>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="padding:10px 25px 0;padding-right:0;padding-left:0;word-break:break-word;">
+                                                    <p style="border-top:solid 24px #F2F2F6;font-size:1px;margin:0px auto;width:100%;">
+                                                    </p>
+                                                    <!--[if mso | IE]>
+                                                            <table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 24px #F2F2F6;font-size:1px;margin:0px auto;width:600px;" role="presentation" width="600px">
+                                                              <tr>
+                                                                <td style="height:0;line-height:0;">
+                                                                  &nbsp;
+                                                                </td>
+                                                              </tr>
+                                                            </table>
+                                                    <![endif]-->
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="" width="600px">
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class=""
+                                   style="width:600px;" width="600">
+                                <tr>
+                                    <td style="line-height:0px;mso-line-height-rule:exactly;">
+                    <![endif]-->
+                    <div style="margin:0px auto;max-width:600px;">
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="width:100%;">
+                            <tbody>
+                            <tr>
+                                <td style="direction:ltr;padding:0px;text-align:center;">
+                                    <!--[if mso | IE]>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td class="" style="vertical-align:top;width:600px;">
+                                    <![endif]-->
+                                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                                               style="vertical-align:top;" width="100%">
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:16px;padding-bottom:8px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;line-height:19px;text-align:left;font-size:14px;font-weight:400;color:#000000;">
+                                                        * Subject to change, conditions may apply
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"
+                                                    style="padding:10px 25px;padding-top:16px;padding-bottom:24px;word-break:break-word;">
+                                                    <div
+                                                        style="font-family:Arial, Helvetica, sans-serif;line-height:19px;text-align:left;font-size:14px;font-weight:400;color:#000000;">
+                                                        Please see our <a
+                                                        href="https://go.plusgrade.com/ss/c/u001.jhW33mUDIsBljXmBWexpaZ-ISINlCeeHJA3Fydj5DuG2q2ELNJ5PL3Nh13WvwivuFkcXiWchETQZw0hv1mp8vIRRpFwr87TSuAnM8Zw_O8hFTyezeH2cWeZz0YkrRUOHHzOs6T-f0cdfvE05TNiURlKfddmXCGM3I-keFGlrsww/4mo/WFcVBaJYTi-IsrZrwtijZA/h6/h001.DxosbtToBu2R6KwqtjlLfh8it0_eYEMb9MRtQiUjwLc">Terms
+                                                        and Conditions</a> and <a
+                                                        href="https://go.plusgrade.com/ss/c/u001.jhW33mUDIsBljXmBWexpaYURQwut8JsvtHPicZPxnW3GhLg1eXW2ggNaXXh5XbrbvJ98B9d6EwUO5AXrby8eHw/4mo/WFcVBaJYTi-IsrZrwtijZA/h7/h001.jaP-QDqwGO-OfU7pVMcD18qXUIJRRm11Gn9ZazEFkQk">Frequently
+                                                        Asked Questions (FAQs)</a> that apply to offers made under our
+                                                        Seat+ service.
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--[if mso | IE]>
+                                    </td>
+                                    </tr>
+                                    </table>
+                                    <![endif]-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    </td>
+                    </tr>
+                    </table>
+                    <![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]>
+    </td>
+    </tr>
+    </table>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600">
+        <tr>
+            <td style="line-height:0px;mso-line-height-rule:exactly;">
+    <![endif]-->
+    <div style="background:#F2F2F6;background-color:#F2F2F6;margin:0px auto;max-width:600px;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+               style="background:#F2F2F6;background-color:#F2F2F6;width:100%;">
+            <tbody>
+            <tr>
+                <td style="direction:ltr;padding:0px;padding-top:16px;text-align:center;">
+                    <!--[if mso | IE]>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="" style="vertical-align:top;width:600px;">
+                    <![endif]-->
+                    <div class="mj-column-per-100 mj-outlook-group-fix"
+                         style="text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation"
+                               style="vertical-align:top;" width="100%">
+                            <tr>
+                                <td align="center" style="padding:10px 25px;word-break:break-word;">
+                                    <div
+                                        style="font-family:Arial, Helvetica, sans-serif;line-height:19px;text-align:center;font-size:14px;font-weight:400;color:#000000;">
+                                        You have received this email because you made a booking with this airline.
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="padding:10px 25px;word-break:break-word;">
+                                    <div
+                                        style="font-family:Arial, Helvetica, sans-serif;line-height:19px;text-align:center;font-size:14px;font-weight:400;color:#000000;">
+                                        A9TUGH, zD0hZSJ5fh5sEd5xKc9pXVPHWsYjbMjlZN
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!--[if mso | IE]>
+                    </td>
+                    </tr>
+                    </table>
+                    <![endif]-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--[if mso | IE]>
+    </td>
+    </tr>
+    </table>
+    <![endif]-->
+</div>
+<div style="display: none"><img alt="" height="1" src="https://upgrade.plusgrade.com/offer/y1u3muiXSV/offer/tag/zD0hZSJ5fh5sEd5xKc9pXVPHWsYjbMjlZN"
+                                width="1"/>
+</div>
+&nbsp;<br><br>
+<table align="center" width="600">
+    <tr>
+        <td><a
+            href="https://go.plusgrade.com/ss/su/u001.-oBD1PPqQ5pXw7k17B0WAQ/4mo/WFcVBaJYTi-IsrZrwtijZA/uh/h001.hTsqR6LnzvJvFc0krFbMw92i2ghNqLsxK9kL68OZiDk">Unsubscribe</a>
+        </td>
+    </tr>
+</table>
+<img alt="" border="0" height="1"
+     src="https://go.plusgrade.com/ss/o/u001.-oBD1PPqQ5pXw7k17B0WAQ/4mo/WFcVBaJYTi-IsrZrwtijZA/ho.gif" style="height:1px !important;width:1px !important;border-width:0 !important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !important;padding-left:0 !important;"
+     width="1"/>
+</body>
+
+</html>
+

@@ -17,7 +17,7 @@ class EmailConfigTest {
 	void testConnection() {
 		EmailConfig emailConfig = new EmailConfig(emailConfigGateway);
 		Assertions.assertThat(emailConfig.testConnection())
-			.isFalse()
+			.isNotEmpty()
 		;
 	}
 }

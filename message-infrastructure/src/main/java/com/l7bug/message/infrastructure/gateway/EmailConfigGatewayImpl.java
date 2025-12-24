@@ -5,11 +5,17 @@ import com.l7bug.message.domain.email.EmailConfigGateway;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeUtility;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -44,19 +50,55 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	}
 
 	@Override
-	public boolean testConnection(EmailConfig emailConfig) {
+	public String testConnection(EmailConfig emailConfig) {
 		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
 		try {
 			javaMailSender.testConnection();
-			return true;
+			return "";
 		} catch (MessagingException e) {
 			log.error("邮件服务连接失败,原因", e);
-			return false;
+			return e.getMessage();
 		}
 	}
 
 	@Override
 	public Optional<EmailConfig> findById(Long id) {
 		return emailConfigRepository.findById(id).map(emailConfigDoMapstruct::mapDomain);
+	}
+
+	@Override
+	public void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, String... to) throws Exception {
+		String testConnection = emailConfig.testConnection();
+		if (!testConnection.isEmpty()) {
+			throw new RuntimeException("[邮件连接失败]::" + testConnection);
+		}
+		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
+		MimeMessage message = javaMailSender.createMimeMessage();
+		// 2. 使用 MimeMessageHelper，第二个参数 true 表示需要支持 multipart（附件、HTML）
+		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+		helper.setFrom(emailConfig.getUsername());
+		helper.setTo(to);
+		helper.setSubject(subject);
+
+		// 3. 设置 HTML 内容
+		// 第二个参数 true 表示发送的是 HTML，如果是 false 则会被当做纯文本显示 HTML 源码
+		helper.setText(content, true);
+
+		if (!files.isEmpty()) {
+			// 4. 添加附件
+			for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+				String fileName = entry.getKey();
+				InputStream is = entry.getValue();
+				// 将 InputStream 转换为 ByteArrayResource，确保数据可以被多次读取且不会因流关闭报错
+				ByteArrayResource resource = new ByteArrayResource(is.readAllBytes());
+				// 对文件名进行编码，防止中文乱码
+				String encodedFileName = MimeUtility.encodeText(fileName);
+				helper.addAttachment(encodedFileName, resource);
+			}
+		}
+
+		// 5. 发送
+		javaMailSender.send(message);
 	}
 }

@@ -3,6 +3,10 @@ package com.l7bug.message.domain.email;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * EmailConfig
@@ -10,6 +14,7 @@ import lombok.Getter;
  * @author Administrator
  * @since 2025/12/23 13:50
  */
+@Slf4j
 @Data
 public class EmailConfig {
 	@Getter(AccessLevel.PRIVATE)
@@ -20,7 +25,17 @@ public class EmailConfig {
 	private String password;
 	private Boolean connection = false;
 
-	public boolean testConnection() {
+	public String testConnection() {
 		return emailConfigGateway.testConnection(this);
+	}
+
+	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, String... to) {
+		try {
+			this.emailConfigGateway.sendMessage(this, subject, content, files, to);
+		} catch (Exception e) {
+			log.error("邮件发送失败!", e);
+			return false;
+		}
+		return true;
 	}
 }

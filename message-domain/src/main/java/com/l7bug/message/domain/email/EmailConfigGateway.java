@@ -1,5 +1,7 @@
 package com.l7bug.message.domain.email;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -9,7 +11,9 @@ import java.util.Optional;
  * @since 2025/12/23 14:14
  */
 public interface EmailConfigGateway {
-	boolean testConnection(EmailConfig emailConfig);
+	String testConnection(EmailConfig emailConfig);
+
+	void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, String... to) throws Exception;
 
 	Optional<EmailConfig> findById(Long id);
 }
