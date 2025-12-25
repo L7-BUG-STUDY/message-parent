@@ -21,3 +21,10 @@ spring:
         generate-ddl: false
         # 延迟初始化，加快启动速度
         open-in-view: false
+    output:
+        ansi:
+            enabled: always
+
+logging:
+    level:
+        root: info

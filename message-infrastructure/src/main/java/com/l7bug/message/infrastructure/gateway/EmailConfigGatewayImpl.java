@@ -109,6 +109,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 			// 4. 添加附件
 			try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 				 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
+				zipOutputStream.setLevel(9);
 				for (Map.Entry<String, InputStream> entry : files.entrySet()) {
 					String fileName = entry.getKey();
 					InputStream is = entry.getValue();

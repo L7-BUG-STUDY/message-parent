@@ -58,9 +58,13 @@ class EmailConfigGatewayImplTest {
 				return;
 			}
 			byte[] htmlBytes = resourceAsStream.readAllBytes();
-			try (ByteArrayInputStream htmlByteArrayIS = new ByteArrayInputStream(htmlBytes)) {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < 10000; i++) {
+				sb.append(UUID.randomUUID());
+			}
+			try (ByteArrayInputStream htmlByteArrayIS = new ByteArrayInputStream(htmlBytes); ByteArrayInputStream sbIS = new ByteArrayInputStream(sb.toString().getBytes())) {
 				String content = new String(htmlBytes, StandardCharsets.UTF_8);
-				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS), "ll789y@gmail.com", "1411205284@qq.com");
+				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS), "ll789y@gmail.com", "l7-bug@qq.com");
 				assertThat(b).isTrue();
 			}
 		}
