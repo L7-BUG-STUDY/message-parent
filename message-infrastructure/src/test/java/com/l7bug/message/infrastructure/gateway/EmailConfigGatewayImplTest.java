@@ -1,5 +1,6 @@
 package com.l7bug.message.infrastructure.gateway;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.l7bug.message.domain.email.EmailConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,8 +27,7 @@ class EmailConfigGatewayImplTest {
 	@Test
 	void testConnection() {
 		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
-		assertThat(byId)
-			.isNotNull();
+		assertThat(byId).isNotNull();
 		if (byId.isEmpty()) {
 			return;
 		}
@@ -37,15 +40,13 @@ class EmailConfigGatewayImplTest {
 		assertThat(emailConfig.testConnection()).isEmpty();
 		assertThat(emailConfig.getConnection()).isTrue();
 		byId = this.emailConfigGateway.findById(UUID.randomUUID().getMostSignificantBits());
-		assertThat(byId).isNotNull()
-			.isEmpty();
+		assertThat(byId).isNotNull().isEmpty();
 	}
 
 	@Test
 	void testSendMessage() throws IOException {
 		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
-		assertThat(byId)
-			.isNotNull();
+		assertThat(byId).isNotNull();
 		if (byId.isEmpty()) {
 			return;
 		}
@@ -64,9 +65,46 @@ class EmailConfigGatewayImplTest {
 			}
 			try (ByteArrayInputStream htmlByteArrayIS = new ByteArrayInputStream(htmlBytes); ByteArrayInputStream sbIS = new ByteArrayInputStream(sb.toString().getBytes())) {
 				String content = new String(htmlBytes, StandardCharsets.UTF_8);
-				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS), "ll789y@gmail.com", "l7-bug@qq.com");
+				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS), true, "ll789y@gmail.com", "l7-bug@qq.com");
 				assertThat(b).isTrue();
 			}
+		}
+	}
+
+	@Test
+	void sendFlightChangeEmail() throws IOException {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
+		assertThat(byId).isNotNull();
+		if (byId.isEmpty()) {
+			return;
+		}
+		JSONObject flightJson = new JSONObject();
+		flightJson.put("orderNo", UUID.randomUUID().toString());
+		flightJson.put("type", "延误");
+		flightJson.put("pnr", UUID.randomUUID().toString().replace("-", "").substring(0, 6));
+		flightJson.put("ticketNo", UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+		flightJson.put("platform", "goms");
+		flightJson.put("notifyTime", LocalDateTime.now().format(dateTimeFormatter));
+		flightJson.put("airlineCode", "MF");
+		flightJson.put("flightNo", "MF12345");
+		flightJson.put("dptDate", LocalDate.now().plusWeeks(1).toString());
+		flightJson.put("dptTime", "00:00");
+		flightJson.put("dptAirPort", "ABC");
+		flightJson.put("arrDate", LocalDate.now().plusWeeks(1).toString());
+		flightJson.put("arrTime", "06:00");
+		flightJson.put("arrAirPort", "CBA");
+		flightJson.put("newAirlineCode", "MF");
+		flightJson.put("newFlightNo", "MF54321");
+		flightJson.put("newDptDate", LocalDate.now().plusWeeks(1).plusDays(1).toString());
+		flightJson.put("newDptTime", "12:00");
+		flightJson.put("newDptAirPort", "ABC");
+		flightJson.put("newArrDate", LocalDate.now().plusWeeks(1).plusDays(1).toString());
+		flightJson.put("newArrTime", "18:00");
+		flightJson.put("newArrAirPort", "CBA");
+		EmailConfig emailConfig = byId.get();
+		try (ByteArrayInputStream in = new ByteArrayInputStream(flightJson.toJSONString().getBytes(StandardCharsets.UTF_8))) {
+			emailConfig.sendMessage("[航变通知]::测试测试测试测试测试测试" + UUID.randomUUID(), ("<h1>航变通知!" + UUID.randomUUID() + "</h1>").repeat(100), Map.of("flight-change.json", in), false, emailConfig.getUsername());
 		}
 	}
 

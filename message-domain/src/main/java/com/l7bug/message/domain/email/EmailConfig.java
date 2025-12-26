@@ -36,9 +36,9 @@ public class EmailConfig {
 		return this.getEmailConfigGateway().save(this);
 	}
 
-	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, String... to) {
+	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) {
 		try {
-			this.emailConfigGateway.sendMessage(this, subject, content, files, true, to);
+			this.emailConfigGateway.sendMessage(this, subject, content, files, canFilesZip, to);
 			this.setConnection(true);
 			return true;
 		} catch (Exception e) {

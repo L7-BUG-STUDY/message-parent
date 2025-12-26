@@ -83,7 +83,7 @@ class EmailConfigTest {
 				true, any(String.class)
 			);
 
-			boolean result = emailConfig.sendMessage("Subject", "Content", files, "recipient@example.com");
+			boolean result = emailConfig.sendMessage("Subject", "Content", files, true, "recipient@example.com");
 
 			Assertions.assertThat(result).isTrue();
 			verify(emailConfigGateway, times(1)).sendMessage(
@@ -112,7 +112,7 @@ class EmailConfigTest {
 				true, any(String.class)
 			);
 
-			boolean result = emailConfig.sendMessage("Subject", "Content", files, "recipient@example.com");
+			boolean result = emailConfig.sendMessage("Subject", "Content", files, true, "recipient@example.com");
 
 			Assertions.assertThat(result).isFalse();
 		} catch (Exception e) {
