@@ -38,7 +38,7 @@ public class EmailConfig {
 
 	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, String... to) {
 		try {
-			this.emailConfigGateway.sendMessage(this, subject, content, files, to);
+			this.emailConfigGateway.sendMessage(this, subject, content, files, true, to);
 			this.setConnection(true);
 			return true;
 		} catch (Exception e) {

@@ -80,7 +80,7 @@ class EmailConfigTest {
 				any(String.class),
 				any(String.class),
 				any(Map.class),
-				any(String.class)
+				true, any(String.class)
 			);
 
 			boolean result = emailConfig.sendMessage("Subject", "Content", files, "recipient@example.com");
@@ -91,7 +91,7 @@ class EmailConfigTest {
 				any(String.class),
 				any(String.class),
 				any(Map.class),
-				any(String.class)
+				true, any(String.class)
 			);
 		} catch (Exception e) {
 			Assertions.fail("Unexpected exception: " + e.getMessage());
@@ -109,7 +109,7 @@ class EmailConfigTest {
 				any(String.class),
 				any(String.class),
 				any(Map.class),
-				any(String.class)
+				true, any(String.class)
 			);
 
 			boolean result = emailConfig.sendMessage("Subject", "Content", files, "recipient@example.com");

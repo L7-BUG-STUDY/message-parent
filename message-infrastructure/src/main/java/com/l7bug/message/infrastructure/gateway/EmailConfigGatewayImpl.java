@@ -87,7 +87,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	}
 
 	@Override
-	public void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, String... to) throws Exception {
+	public void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) throws Exception {
 		String testConnection = emailConfig.testConnection();
 		if (!testConnection.isEmpty()) {
 			throw new RuntimeException("[邮件连接失败]::" + testConnection);
@@ -107,22 +107,30 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 		if (!files.isEmpty()) {
 			// 4. 添加附件
-			try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
-				zipOutputStream.setLevel(9);
+			if (canFilesZip) {
+				try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+					 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
+					zipOutputStream.setLevel(9);
+					for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+						String fileName = entry.getKey();
+						InputStream is = entry.getValue();
+						try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(is.readAllBytes())) {
+							ZipEntry zipEntry = new ZipEntry(fileName);
+							zipOutputStream.putNextEntry(zipEntry);
+							byteArrayInputStream.transferTo(zipOutputStream);
+							zipOutputStream.closeEntry();
+						}
+					}
+					zipOutputStream.finish();
+					String encodedFileName = MimeUtility.encodeText("attachments.zip");
+					helper.addAttachment(encodedFileName, new ByteArrayResource(byteArrayOutputStream.toByteArray()));
+				}
+			} else {
 				for (Map.Entry<String, InputStream> entry : files.entrySet()) {
 					String fileName = entry.getKey();
 					InputStream is = entry.getValue();
-					try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(is.readAllBytes())) {
-						ZipEntry zipEntry = new ZipEntry(fileName);
-						zipOutputStream.putNextEntry(zipEntry);
-						byteArrayInputStream.transferTo(zipOutputStream);
-						zipOutputStream.closeEntry();
-					}
+					helper.addAttachment(fileName, new ByteArrayResource(is.readAllBytes()));
 				}
-				zipOutputStream.finish();
-				String encodedFileName = MimeUtility.encodeText("attachments.zip");
-				helper.addAttachment(encodedFileName, new ByteArrayResource(byteArrayOutputStream.toByteArray()));
 			}
 		}
 
