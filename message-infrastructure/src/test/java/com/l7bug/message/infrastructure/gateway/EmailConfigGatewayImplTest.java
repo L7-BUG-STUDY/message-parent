@@ -81,7 +81,7 @@ class EmailConfigGatewayImplTest {
 		}
 		JSONObject flightJson = new JSONObject();
 		flightJson.put("orderNo", UUID.randomUUID().toString());
-		flightJson.put("type", "延误");
+		flightJson.put("type", "delay");
 		flightJson.put("pnr", UUID.randomUUID().toString().replace("-", "").substring(0, 6));
 		flightJson.put("ticketNo", UUID.randomUUID().toString().replace("-", "").substring(0, 12));
 		flightJson.put("platform", "goms");
