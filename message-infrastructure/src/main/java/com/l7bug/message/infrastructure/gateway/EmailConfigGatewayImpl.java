@@ -2,6 +2,7 @@ package com.l7bug.message.infrastructure.gateway;
 
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailConfigGateway;
+import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
@@ -14,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -136,5 +138,10 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 		// 5. 发送
 		javaMailSender.send(message);
+	}
+
+	@Override
+	public void sendMessage(EmailConfig emailConfig, @Validated EmailRecord emailRecord) {
+
 	}
 }

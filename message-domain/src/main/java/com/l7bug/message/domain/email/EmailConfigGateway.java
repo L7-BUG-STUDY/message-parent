@@ -1,5 +1,7 @@
 package com.l7bug.message.domain.email;
 
+import com.l7bug.message.domain.email.record.EmailRecord;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -34,11 +36,13 @@ public interface EmailConfigGateway {
 	 * @param subject     邮件主题
 	 * @param content     邮件内容（HTML格式）
 	 * @param files       附件映射，键为文件名，值为文件输入流
-	 * @param canFilesZip
+	 * @param canFilesZip 是否允许将多个附件压缩成zip发送
 	 * @param to          收件人邮箱地址列表
 	 * @throws Exception 发送过程中可能出现的异常
 	 */
 	void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) throws Exception;
+
+	void sendMessage(EmailConfig emailConfig, EmailRecord emailRecord);
 
 	Optional<EmailConfig> findById(Long id);
 }

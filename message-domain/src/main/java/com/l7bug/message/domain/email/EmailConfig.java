@@ -1,5 +1,7 @@
 package com.l7bug.message.domain.email;
 
+import com.l7bug.message.domain.email.record.EmailRecord;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -45,5 +47,9 @@ public class EmailConfig {
 			log.error("邮件发送失败!", e);
 			return false;
 		}
+	}
+
+	public boolean send(@Valid EmailRecord emailRecord) {
+		return true;
 	}
 }

@@ -17,6 +17,8 @@
 	<modules>
 		<module>message-domain</module>
 		<module>message-infrastructure</module>
+		<module>demo</module>
+		<module>config</module>
 	</modules>
 
 	<properties>

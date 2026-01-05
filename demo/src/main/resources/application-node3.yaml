@@ -1,0 +1,11 @@
+server:
+    port: 38761
+spring:
+    application:
+        name: eureka-server
+eureka:
+    client:
+        service-url:
+            # 指向其他节点
+            defaultZone: http://localhost:18761/eureka/,http://localhost:28761/eureka/
+

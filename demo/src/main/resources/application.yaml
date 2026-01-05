@@ -1,0 +1,8 @@
+spring:
+    profiles:
+        active: node1
+    application:
+        name: eureka-server
+    threads:
+        virtual:
+            enabled: true
