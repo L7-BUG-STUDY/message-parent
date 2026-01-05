@@ -6,3 +6,6 @@ spring:
     threads:
         virtual:
             enabled: true
+    cloud:
+        refresh:
+            enabled: false # 必须设置为 false 才能通过 AOT 编译
