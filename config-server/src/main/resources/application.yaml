@@ -1,0 +1,22 @@
+spring:
+    application:
+        name: config-server
+    threads:
+        virtual:
+            enabled: true
+    cloud:
+        config:
+            server:
+                git:
+                    # 替换为你刚才创建的 Git 地址
+                    uri: https://github.com/L7-BUG-STUDY/config-repo.git
+                    # 默认搜索的分支，最新版 Git 通常是 main
+                    default-label: main
+                    # 强制拉取（如果本地有旧的缓存，会自动覆盖）
+                    force-pull: true
+eureka:
+    client:
+        service-url:
+            defaultZone: http://localhost:18761/eureka/,http://localhost:28761/eureka/,http://localhost:38761/eureka/
+server:
+    port: 0

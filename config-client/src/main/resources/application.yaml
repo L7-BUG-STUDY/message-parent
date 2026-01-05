@@ -1,0 +1,20 @@
+spring:
+    application:
+        name: config-client
+    threads:
+        virtual:
+            enabled: true
+    cloud:
+        config:
+            discovery:
+                enabled: true
+                service-id: config-server
+            name: order-service # 重点：告诉 Config Server 读 common.yml 和 order-config.yml
+            profile: dev
+    config:
+        # 导入远程配置中心的地址
+        import: "optional:configserver:"
+eureka:
+    client:
+        service-url:
+            defaultZone: http://localhost:18761/eureka/,http://localhost:28761/eureka/,http://localhost:38761/eureka/
