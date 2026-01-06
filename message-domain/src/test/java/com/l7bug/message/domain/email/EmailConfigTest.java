@@ -72,40 +72,32 @@ class EmailConfigTest {
 
 	@Test
 	@DisplayName("测试发送邮件成功")
-	void testSendMessageSuccess() {
-		try {
-			EmailRecord emailRecord = new EmailRecord(mock());
-			Mockito.doNothing().when(emailConfigGateway).sendMessage(
-				any(EmailConfig.class),
-				emailRecord,
-				true
-			);
+	void testSendMessageSuccess() throws Exception {
+		EmailRecord emailRecord = new EmailRecord(Mockito.mock());
+		Mockito.doNothing().when(emailConfigGateway).sendMessage(
+			emailConfig,
+			emailRecord,
+			true
+		);
 
-			boolean result = emailConfig.send(emailRecord, true);
+		boolean result = emailConfig.send(emailRecord, true);
 
-			Assertions.assertThat(result).isTrue();
-			verify(emailConfigGateway, times(1)).sendMessage(
-				any(EmailConfig.class), emailRecord, true
-			);
-		} catch (Exception e) {
-			Assertions.fail("Unexpected exception: " + e.getMessage());
-		}
+		Assertions.assertThat(result).isTrue();
+		verify(emailConfigGateway, times(1)).sendMessage(
+			emailConfig, emailRecord, true
+		);
 	}
 
 	@Test
 	@DisplayName("测试发送邮件失败")
-	void testSendMessageFailure() {
-		try {
-			EmailRecord emailRecord = new EmailRecord(mock());
-			Mockito.doThrow(new RuntimeException("Send failed")).when(emailConfigGateway).sendMessage(
-				any(EmailConfig.class), emailRecord, true
-			);
+	void testSendMessageFailure() throws Exception {
+		EmailRecord emailRecord = new EmailRecord(Mockito.mock());
+		Mockito.doThrow(new RuntimeException("Send failed")).when(emailConfigGateway).sendMessage(
+			emailConfig, emailRecord, false
+		);
 
-			boolean result = emailConfig.send(emailRecord, false);
+		boolean result = emailConfig.send(emailRecord, false);
 
-			Assertions.assertThat(result).isFalse();
-		} catch (Exception e) {
-			Assertions.fail("Unexpected exception: " + e.getMessage());
-		}
+		Assertions.assertThat(result).isFalse();
 	}
 }
