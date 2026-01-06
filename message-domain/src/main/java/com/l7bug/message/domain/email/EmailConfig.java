@@ -50,4 +50,8 @@ public class EmailConfig {
 			return false;
 		}
 	}
+
+	public boolean send(EmailRecord emailRecord) {
+		return send(emailRecord, false);
+	}
 }

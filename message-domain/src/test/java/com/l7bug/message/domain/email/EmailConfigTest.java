@@ -7,9 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +51,9 @@ class EmailConfigTest {
 
 		var result = emailConfig.testConnection();
 
-		Assertions.assertThat(result).isNotEmpty().asString().isEqualTo(errorMessage);
+		// 分别验证结果和连接状态
+		Assertions.assertThat(result).isNotEmpty();
+		Assertions.assertThat(result.get()).isEqualTo(errorMessage);
 		Assertions.assertThat(emailConfig.getConnection()).isFalse();
 		verify(emailConfigGateway, times(1)).testConnection(any(EmailConfig.class));
 		verify(emailConfigGateway, times(1)).save(any(EmailConfig.class));
@@ -96,19 +95,13 @@ class EmailConfigTest {
 	@Test
 	@DisplayName("测试发送邮件失败")
 	void testSendMessageFailure() {
-		Map<String, InputStream> files = new HashMap<>();
-
 		try {
 			EmailRecord emailRecord = new EmailRecord(mock());
 			Mockito.doThrow(new RuntimeException("Send failed")).when(emailConfigGateway).sendMessage(
-				any(EmailConfig.class),
-				any(String.class),
-				any(String.class),
-				any(Map.class),
-				true, any(String.class)
+				any(EmailConfig.class), emailRecord, true
 			);
 
-			boolean result = emailConfig.sendMessage("Subject", "Content", files, true, "recipient@example.com");
+			boolean result = emailConfig.send(emailRecord, false);
 
 			Assertions.assertThat(result).isFalse();
 		} catch (Exception e) {
