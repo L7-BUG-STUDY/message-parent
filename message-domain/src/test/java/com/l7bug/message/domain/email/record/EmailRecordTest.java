@@ -7,6 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +106,7 @@ class EmailRecordTest {
 
 	@Test
 	void testSetAndGetFiles() {
-		Map<String, String> expectedFiles = Map.of("file1", "filename1");
+		Map<String, InputStream> expectedFiles = Map.of("file1", new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
 		emailRecord.setFiles(expectedFiles);
 		assertThat(emailRecord.getFiles()).isEqualTo(expectedFiles);
 	}

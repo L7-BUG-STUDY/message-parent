@@ -90,7 +90,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	}
 
 	@Override
-	public void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) throws Exception {
+	public void sendMessage(EmailConfig emailConfig, EmailRecord record, boolean canFileZip) throws Exception {
 		var testConnection = emailConfig.testConnection();
 		if (testConnection.isPresent()) {
 			throw new RemoteException(RemoteErrorCode.EMAIL_CLIENT_ERROR);
@@ -101,20 +101,20 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
 		helper.setFrom(emailConfig.getUsername());
-		helper.setTo(to);
-		helper.setSubject(subject);
+		helper.setTo(record.getRecipients().toArray(new String[0]));
+		helper.setSubject(record.getSubject());
 
 		// 3. 设置 HTML 内容
 		// 第二个参数 true 表示发送的是 HTML，如果是 false 则会被当做纯文本显示 HTML 源码
-		helper.setText(content, true);
+		helper.setText(record.getContent(), true);
 
-		if (!files.isEmpty()) {
+		if (!record.getFiles().isEmpty()) {
 			// 4. 添加附件
-			if (canFilesZip) {
+			if (canFileZip) {
 				try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 					 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
 					zipOutputStream.setLevel(9);
-					for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+					for (Map.Entry<String, InputStream> entry : record.getFiles().entrySet()) {
 						String fileName = entry.getKey();
 						InputStream is = entry.getValue();
 						try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(is.readAllBytes())) {
@@ -129,7 +129,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 					helper.addAttachment(encodedFileName, new ByteArrayResource(byteArrayOutputStream.toByteArray()));
 				}
 			} else {
-				for (Map.Entry<String, InputStream> entry : files.entrySet()) {
+				for (Map.Entry<String, InputStream> entry : record.getFiles().entrySet()) {
 					String fileName = entry.getKey();
 					InputStream is = entry.getValue();
 					helper.addAttachment(fileName, new ByteArrayResource(is.readAllBytes()));
@@ -139,10 +139,5 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 		// 5. 发送
 		javaMailSender.send(message);
-	}
-
-	@Override
-	public void sendMessage(EmailConfig emailConfig, EmailRecord message) {
-
 	}
 }

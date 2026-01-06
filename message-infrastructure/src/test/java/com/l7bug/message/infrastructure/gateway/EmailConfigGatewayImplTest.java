@@ -1,7 +1,8 @@
 package com.l7bug.message.infrastructure.gateway;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.l7bug.message.domain.email.EmailConfig;
+import com.l7bug.message.domain.email.record.EmailRecord;
+import com.l7bug.message.domain.email.record.EmailRecordGateway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,9 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EmailConfigGatewayImplTest {
 	@Autowired
 	private EmailConfigGatewayImpl emailConfigGateway;
+
+	@Autowired
+	private EmailRecordGateway emailRecordGateway;
 
 	@Test
 	void testConnection() {
@@ -65,46 +67,14 @@ class EmailConfigGatewayImplTest {
 			}
 			try (ByteArrayInputStream htmlByteArrayIS = new ByteArrayInputStream(htmlBytes); ByteArrayInputStream sbIS = new ByteArrayInputStream(sb.toString().getBytes())) {
 				String content = new String(htmlBytes, StandardCharsets.UTF_8);
-				boolean b = emailConfig.sendMessage("测试", content, Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS), true, "ll789y@gmail.com", "l7-bug@qq.com");
+				EmailRecord emailRecord = new EmailRecord(emailRecordGateway);
+				emailRecord.setSubject("测试");
+				emailRecord.setContent(content);
+				emailRecord.setFiles(Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS));
+				emailRecord.setRecipients(List.of("ll789y@gmail.com", "l7-bug@qq.com"));
+				boolean b = emailConfig.send(emailRecord, true);
 				assertThat(b).isTrue();
 			}
-		}
-	}
-
-	@Test
-	void sendFlightChangeEmail() throws IOException {
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
-		assertThat(byId).isNotNull();
-		if (byId.isEmpty()) {
-			return;
-		}
-		JSONObject flightJson = new JSONObject();
-		flightJson.put("orderNo", UUID.randomUUID().toString());
-		flightJson.put("type", "delay");
-		flightJson.put("pnr", UUID.randomUUID().toString().replace("-", "").substring(0, 6));
-		flightJson.put("ticketNo", UUID.randomUUID().toString().replace("-", "").substring(0, 12));
-		flightJson.put("platform", "goms");
-		flightJson.put("notifyTime", LocalDateTime.now().format(dateTimeFormatter));
-		flightJson.put("airlineCode", UUID.randomUUID().toString().substring(0, 2).toUpperCase());
-		flightJson.put("flightNo", flightJson.getString("airlineCode") + UUID.randomUUID().toString().hashCode());
-		flightJson.put("dptDate", LocalDate.now().plusWeeks(1).toString());
-		flightJson.put("dptTime", "00:00");
-		flightJson.put("dptAirPort", UUID.randomUUID().toString().substring(0, 3).toUpperCase());
-		flightJson.put("arrDate", LocalDate.now().plusWeeks(1).toString());
-		flightJson.put("arrTime", "06:00");
-		flightJson.put("arrAirPort", UUID.randomUUID().toString().substring(0, 3).toUpperCase());
-		flightJson.put("newAirlineCode", UUID.randomUUID().toString().substring(0, 2).toUpperCase());
-		flightJson.put("newFlightNo", flightJson.getString("newAirlineCode") + UUID.randomUUID().toString().hashCode());
-		flightJson.put("newDptDate", LocalDate.now().plusWeeks(1).plusDays(1).toString());
-		flightJson.put("newDptTime", "12:00");
-		flightJson.put("newDptAirPort", UUID.randomUUID().toString().substring(0, 3).toUpperCase());
-		flightJson.put("newArrDate", LocalDate.now().plusWeeks(1).plusDays(1).toString());
-		flightJson.put("newArrTime", "18:00");
-		flightJson.put("newArrAirPort", UUID.randomUUID().toString().substring(0, 3).toUpperCase());
-		EmailConfig emailConfig = byId.get();
-		try (ByteArrayInputStream in = new ByteArrayInputStream(flightJson.toJSONString().getBytes(StandardCharsets.UTF_8))) {
-			emailConfig.sendMessage("[航变通知]::测试测试测试测试测试测试" + UUID.randomUUID(), ("<h1>航变通知!" + UUID.randomUUID() + "</h1>").repeat(100), Map.of("flight-change.json", in), false, emailConfig.getUsername());
 		}
 	}
 

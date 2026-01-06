@@ -3,6 +3,7 @@ package com.l7bug.message.infrastructure.gateway;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
  * @author Administrator
  * @since 2025/12/29 17:37
  */
+@Component
 public class EmailRecordGatewayImpl implements EmailRecordGateway {
 	@Override
 	public boolean save(EmailRecord emailRecord) {

@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -42,18 +40,14 @@ public class EmailConfig {
 		return this.getEmailConfigGateway().save(this);
 	}
 
-	public boolean sendMessage(String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) {
+	public boolean send(EmailRecord emailRecord, boolean canFileZip) {
 		try {
-			this.emailConfigGateway.sendMessage(this, subject, content, files, canFilesZip, to);
+			this.emailConfigGateway.sendMessage(this, emailRecord, canFileZip);
 			this.setConnection(true);
 			return true;
 		} catch (Exception e) {
 			log.error("邮件发送失败!", e);
 			return false;
 		}
-	}
-
-	public boolean send(EmailRecord emailRecord) {
-		return true;
 	}
 }

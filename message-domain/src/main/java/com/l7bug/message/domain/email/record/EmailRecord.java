@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class EmailRecord {
 	 * key=文件id
 	 * value=文件名称
 	 */
-	private Map<String, String> files;
+	private Map<String, InputStream> files = Map.of();
 
 	public boolean send(EmailConfig emailConfig) {
 		if (recipients.isEmpty()) {

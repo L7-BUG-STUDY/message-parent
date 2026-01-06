@@ -5,8 +5,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,20 +31,7 @@ public interface EmailConfigGateway {
 	 */
 	Optional<String> testConnection(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig);
 
-	/**
-	 * 发送邮件
-	 *
-	 * @param emailConfig 邮件配置对象，包含SMTP服务器信息和认证凭据
-	 * @param subject     邮件主题
-	 * @param content     邮件内容（HTML格式）
-	 * @param files       附件映射，键为文件名，值为文件输入流
-	 * @param canFilesZip 是否允许将多个附件压缩成zip发送
-	 * @param to          收件人邮箱地址列表
-	 * @throws Exception 发送过程中可能出现的异常
-	 */
-	void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) throws Exception;
-
-	void sendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息") @Validated(EmailValidGroups.Send.class) EmailRecord message);
+	void sendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息") @Validated(EmailValidGroups.Send.class) EmailRecord record, boolean canFileZip) throws Exception;
 
 	Optional<EmailConfig> findById(Long id);
 }

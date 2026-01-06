@@ -1,5 +1,6 @@
 package com.l7bug.message.domain.email;
 
+import com.l7bug.message.domain.email.record.EmailRecord;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -73,26 +74,19 @@ class EmailConfigTest {
 	@Test
 	@DisplayName("测试发送邮件成功")
 	void testSendMessageSuccess() {
-		Map<String, InputStream> files = new HashMap<>();
-
 		try {
+			EmailRecord emailRecord = new EmailRecord(mock());
 			Mockito.doNothing().when(emailConfigGateway).sendMessage(
 				any(EmailConfig.class),
-				any(String.class),
-				any(String.class),
-				any(Map.class),
-				true, any(String.class)
+				emailRecord,
+				true
 			);
 
-			boolean result = emailConfig.sendMessage("Subject", "Content", files, true, "recipient@example.com");
+			boolean result = emailConfig.send(emailRecord, true);
 
 			Assertions.assertThat(result).isTrue();
 			verify(emailConfigGateway, times(1)).sendMessage(
-				any(EmailConfig.class),
-				any(String.class),
-				any(String.class),
-				any(Map.class),
-				true, any(String.class)
+				any(EmailConfig.class), emailRecord, true
 			);
 		} catch (Exception e) {
 			Assertions.fail("Unexpected exception: " + e.getMessage());
@@ -105,6 +99,7 @@ class EmailConfigTest {
 		Map<String, InputStream> files = new HashMap<>();
 
 		try {
+			EmailRecord emailRecord = new EmailRecord(mock());
 			Mockito.doThrow(new RuntimeException("Send failed")).when(emailConfigGateway).sendMessage(
 				any(EmailConfig.class),
 				any(String.class),
