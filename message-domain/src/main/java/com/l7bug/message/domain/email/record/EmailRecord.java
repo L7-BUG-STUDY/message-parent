@@ -1,6 +1,7 @@
 package com.l7bug.message.domain.email.record;
 
 import com.l7bug.message.domain.email.EmailConfig;
+import com.l7bug.message.domain.email.EmailValidGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
@@ -33,7 +34,7 @@ public class EmailRecord {
 	/**
 	 * 主题
 	 */
-	@NotBlank(message = "邮件主题不能为空", groups = RecordGroups.Send.class)
+	@NotBlank(message = "邮件主题不能为空", groups = EmailValidGroups.Send.class)
 	private String subject;
 	/**
 	 * 发送人
@@ -42,7 +43,7 @@ public class EmailRecord {
 	/**
 	 * 接收人
 	 */
-	@NotEmpty(message = "邮件接收人不能为空", groups = RecordGroups.Send.class)
+	@NotEmpty(message = "邮件接收人不能为空", groups = EmailValidGroups.Send.class)
 	private List<String> recipients;
 	/**
 	 * 发送时间
@@ -55,7 +56,7 @@ public class EmailRecord {
 	/**
 	 * 内容
 	 */
-	@NotBlank(message = "邮件内容不能为空", groups = RecordGroups.Send.class)
+	@NotBlank(message = "邮件内容不能为空", groups = EmailValidGroups.Send.class)
 	private String content;
 
 	/**

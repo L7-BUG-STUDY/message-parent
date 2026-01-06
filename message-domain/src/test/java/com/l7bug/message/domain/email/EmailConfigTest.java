@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -33,9 +34,9 @@ class EmailConfigTest {
 	@DisplayName("测试连接成功")
 	void testConnectionSuccess() {
 		// 模拟连接成功的情况
-		when(emailConfigGateway.testConnection(any(EmailConfig.class))).thenReturn("");
+		when(emailConfigGateway.testConnection(any(EmailConfig.class))).thenReturn(Optional.empty());
 
-		String result = emailConfig.testConnection();
+		var result = emailConfig.testConnection();
 
 		Assertions.assertThat(result).isEmpty();
 		Assertions.assertThat(emailConfig.getConnection()).isTrue();
@@ -48,11 +49,11 @@ class EmailConfigTest {
 	void testConnectionFailure() {
 		// 模拟连接失败的情况
 		String errorMessage = "Connection failed";
-		when(emailConfigGateway.testConnection(any(EmailConfig.class))).thenReturn(errorMessage);
+		when(emailConfigGateway.testConnection(any(EmailConfig.class))).thenReturn(Optional.of(errorMessage));
 
-		String result = emailConfig.testConnection();
+		var result = emailConfig.testConnection();
 
-		Assertions.assertThat(result).isEqualTo(errorMessage);
+		Assertions.assertThat(result).isNotEmpty().asString().isEqualTo(errorMessage);
 		Assertions.assertThat(emailConfig.getConnection()).isFalse();
 		verify(emailConfigGateway, times(1)).testConnection(any(EmailConfig.class));
 		verify(emailConfigGateway, times(1)).save(any(EmailConfig.class));

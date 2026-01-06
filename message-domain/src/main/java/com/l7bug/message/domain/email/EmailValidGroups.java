@@ -1,4 +1,4 @@
-package com.l7bug.message.domain.email.record;
+package com.l7bug.message.domain.email;
 
 /**
  * RecordGroups
@@ -6,7 +6,7 @@ package com.l7bug.message.domain.email.record;
  * @author Administrator
  * @since 2025/12/29 13:37
  */
-public interface RecordGroups {
+public interface EmailValidGroups {
 	interface Send {
 	}
 }

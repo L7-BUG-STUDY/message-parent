@@ -1,5 +1,7 @@
 package com.l7bug.message.infrastructure.gateway;
 
+import com.l7bug.common.error.RemoteErrorCode;
+import com.l7bug.common.exception.RemoteException;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailConfigGateway;
 import com.l7bug.message.domain.email.record.EmailRecord;
@@ -15,7 +17,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -67,19 +68,19 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 
 	@Override
-	public String testConnection(EmailConfig emailConfig) {
+	public Optional<String> testConnection(EmailConfig emailConfig) {
 		// 构建邮件发送器
 		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
 		try {
 			// 测试连接
 			javaMailSender.testConnection();
 			// 连接成功返回空字符串
-			return "";
+			return Optional.empty();
 		} catch (MessagingException e) {
 			// 记录连接失败的错误日志
 			log.error("邮件服务连接失败,原因", e);
 			// 连接失败返回错误信息
-			return e.getMessage();
+			return Optional.of(e.getMessage());
 		}
 	}
 
@@ -90,9 +91,9 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 	@Override
 	public void sendMessage(EmailConfig emailConfig, String subject, String content, Map<String, InputStream> files, boolean canFilesZip, String... to) throws Exception {
-		String testConnection = emailConfig.testConnection();
-		if (!testConnection.isEmpty()) {
-			throw new RuntimeException("[邮件连接失败]::" + testConnection);
+		var testConnection = emailConfig.testConnection();
+		if (testConnection.isPresent()) {
+			throw new RemoteException(RemoteErrorCode.EMAIL_CLIENT_ERROR);
 		}
 		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
 		MimeMessage message = javaMailSender.createMimeMessage();
@@ -141,7 +142,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	}
 
 	@Override
-	public void sendMessage(EmailConfig emailConfig, @Validated EmailRecord emailRecord) {
+	public void sendMessage(EmailConfig emailConfig, EmailRecord message) {
 
 	}
 }

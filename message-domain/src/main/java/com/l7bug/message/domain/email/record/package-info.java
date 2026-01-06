@@ -7,3 +7,4 @@
 @NullMarked
 package com.l7bug.message.domain.email.record;
 
+import org.jspecify.annotations.NullMarked;
