@@ -99,5 +99,6 @@ class EmailConfigTest {
 		boolean result = emailConfig.send(emailRecord, false);
 
 		Assertions.assertThat(result).isFalse();
+		emailConfig.send(emailRecord);
 	}
 }
