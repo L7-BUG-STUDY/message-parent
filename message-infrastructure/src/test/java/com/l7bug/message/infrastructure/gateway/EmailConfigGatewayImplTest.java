@@ -5,6 +5,7 @@ import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
+import jakarta.mail.Store;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -85,5 +86,22 @@ class EmailConfigGatewayImplTest {
 		emailConfig.setUsername(faker.internet().safeEmailAddress());
 		emailConfig.setPassword(faker.internet().password());
 		emailConfig.save();
+	}
+
+	@Test
+	void getImapStore() throws Exception {
+		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
+		assertThat(byId).isNotNull();
+		if (byId.isEmpty()) {
+			return;
+		}
+		EmailConfig emailConfig = byId.get();
+		Optional<Store> imapStore = this.emailConfigGateway.getImapStore(emailConfig);
+		if (imapStore.isEmpty()) {
+			return;
+		}
+		System.err.println(imapStore.get().getDefaultFolder());
+		imapStore.get().close();
+		System.err.println();
 	}
 }

@@ -48,17 +48,23 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 	public JavaMailSenderImpl buildSender(EmailConfig emailConfig) {
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
-		sender.setHost(emailConfig.getType().getSmtpHost());
-		sender.setPort(emailConfig.getType().getSmtpPort());
 		sender.setUsername(emailConfig.getUsername());
 		sender.setPassword(emailConfig.getPassword());
 		sender.setDefaultEncoding("UTF-8");
 		Properties props = sender.getJavaMailProperties();
+		props.put("mail.smtp.host", emailConfig.getType().getSmtpHost());
+		props.put("mail.smtp.port", emailConfig.getType().getSmtpPort());
 		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-		// 如果端口是 465，通常需要开启 SSL
 		props.put("mail.smtp.ssl.enable", "true");
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		// 如果端口是 465，通常需要开启 SSL
+		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+		// imap
+		props.put("mail.imap.host", emailConfig.getType().getImapHost());
+		props.put("mail.imap.port", emailConfig.getType().getImapPort());
+		props.put("mail.imap.auth", "true");
+		props.put("mail.imap.ssl.enable", "true");
+		// props.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		return sender;
 	}
 
@@ -156,7 +162,15 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 			return Optional.empty();
 		}
 		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
-		return null;
+		Properties javaMailProperties = javaMailSender.getJavaMailProperties();
+		Session session = Session.getInstance(javaMailProperties);
+		try {
+			Store imaps = session.getStore("imaps");
+			imaps.connect(emailConfig.getType().getImapHost(), emailConfig.getUsername(), emailConfig.getPassword());
+			return Optional.of(imaps);
+		} catch (MessagingException e) {
+			return Optional.empty();
+		}
 	}
 
 	private String getContent(@Nullable Object content, BiConsumer<String, byte[]> fileBackFun) throws Exception {
