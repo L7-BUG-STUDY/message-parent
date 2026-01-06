@@ -1,6 +1,5 @@
 package com.l7bug.message.domain.email.record;
 
-import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailValidGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,7 +30,7 @@ public class EmailRecord {
 	/**
 	 * 文件夹
 	 */
-	private String folder;
+	private String folder = "";
 	/**
 	 * 主题
 	 */
@@ -66,20 +65,4 @@ public class EmailRecord {
 	 * value=文件名称
 	 */
 	private Map<String, InputStream> files = Map.of();
-
-	public boolean send(EmailConfig emailConfig) {
-		if (recipients.isEmpty()) {
-			return false;
-		}
-		// 根据配置设置发送人
-		this.setFromAddress(List.of(emailConfig.getUsername()));
-		this.receivedDate = LocalDateTime.now();
-		this.setSentDate(this.receivedDate);
-		boolean sendFlag = emailRecordGateway.sendByConfig(this, emailConfig);
-		if (!sendFlag) {
-			// 发送失败,返回false
-			return false;
-		}
-		return emailRecordGateway.save(this);
-	}
 }

@@ -36,5 +36,10 @@
 			<groupId>com.l7bug</groupId>
 			<artifactId>l7bug-common</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.mail</groupId>
+			<artifactId>jakarta.mail-api</artifactId>
+		</dependency>
 	</dependencies>
 </project>

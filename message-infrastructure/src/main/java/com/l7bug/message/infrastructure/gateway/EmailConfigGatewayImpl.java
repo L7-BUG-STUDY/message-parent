@@ -1,5 +1,8 @@
 package com.l7bug.message.infrastructure.gateway;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import com.l7bug.common.error.RemoteErrorCode;
 import com.l7bug.common.exception.RemoteException;
 import com.l7bug.message.domain.email.EmailConfig;
@@ -8,11 +11,12 @@ import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
-import jakarta.mail.MessagingException;
+import jakarta.mail.*;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,9 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -38,6 +41,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 @AllArgsConstructor
 public class EmailConfigGatewayImpl implements EmailConfigGateway {
+	private static final Set<String> BREAK_FOLDER_NAME = new HashSet<>(Arrays.asList("Junk", "Drafts", "Deleted Messages", "Sent Messages"));
 	private final EmailConfigRepository emailConfigRepository;
 
 	private final EmailConfigDoMapstruct emailConfigDoMapstruct;
@@ -65,7 +69,6 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		emailConfig.setId(emailConfigDo.getId());
 		return true;
 	}
-
 
 	@Override
 	public Optional<String> testConnection(EmailConfig emailConfig) {
@@ -139,5 +142,139 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 		// 5. 发送
 		javaMailSender.send(message);
+	}
+
+	@Override
+	public void pullNotReadMessage(EmailConfig emailConfig, BiConsumer<EmailRecord, Message> consumer) {
+
+	}
+
+	@Override
+	public Optional<Store> getImapStore(EmailConfig emailConfig) {
+		emailConfig.testConnection();
+		if (!emailConfig.getConnection()) {
+			return Optional.empty();
+		}
+		JavaMailSenderImpl javaMailSender = buildSender(emailConfig);
+		return null;
+	}
+
+	private String getContent(@Nullable Object content, BiConsumer<String, byte[]> fileBackFun) throws Exception {
+		if (content == null) {
+			return "";
+		}
+		if (content instanceof Multipart multipart) {
+			int count = multipart.getCount();
+			// 邮件内容builder,后续返回
+			StringBuilder builder = new StringBuilder();
+			StringBuilder typeBuilder = new StringBuilder();
+			for (int i = 0; i < count; i++) {
+				BodyPart bodyPart = multipart.getBodyPart(i);
+				typeBuilder.append(bodyPart.getContentType());
+			}
+			for (int i = 0; i < count; i++) {
+				BodyPart bodyPart = multipart.getBodyPart(i);
+				if (typeBuilder.toString().contains("text/plain") && typeBuilder.toString().contains("text/html")) {
+					// 纯文本与html同时存在,只需要处理html,纯文本跳过
+					if (bodyPart.isMimeType("text/plain")) {
+						continue;
+					}
+				}
+				String disposition = bodyPart.getDisposition();
+				String fileName = bodyPart.getFileName();
+				if (fileName != null) {
+					fileName = MimeUtility.decodeText(fileName);
+				}
+				if (StrUtil.isBlank(fileName)) {
+					// 文件名可能在请求头里
+					String[] header = bodyPart.getHeader("Content-Type");
+					if (header != null) {
+						for (String s : header) {
+							if (s.contains("name=")) {
+								fileName = s.split("name=")[1].replace("\"", "").trim();
+								break;
+							}
+							if (s.contains("name*=")) {
+								fileName = s.split("name\\*=")[1].replace("\"", "").trim();
+								break;
+							}
+						}
+						if (StrUtil.isNotBlank(fileName)) {
+							fileName = URLUtil.decode(fileName);
+							fileName = fileName.replace("UTF-8''", "").replace("utf-8''", "");
+						}
+					}
+				}
+				// 处理文件可能存在的路径问题,如:D://1.txt,/home/user1/1.txt
+				fileName = Optional.ofNullable(fileName)
+					.map(temp -> temp.split("/")[temp.split("/").length - 1])
+					.map(temp -> temp.split("\\\\")[temp.split("\\\\").length - 1])
+					.orElse("");
+				if (StrUtil.isAllNotBlank(disposition, fileName) && disposition.equalsIgnoreCase(Part.ATTACHMENT)) {
+					// 文件名存在,开始处理文件
+					try (InputStream inputStream = bodyPart.getInputStream()) {
+						// 读取文件,最后调用回调函数,外部处理
+						byte[] fileBytes = IoUtil.readBytes(inputStream, false);
+						fileBackFun.accept(fileName, fileBytes);
+					}
+					continue;
+				}
+				builder.append(getContent(bodyPart, fileBackFun));
+			}
+			return builder.toString();
+		} else if (content instanceof String) {
+			return content.toString();
+		}
+		if (content instanceof BodyPart bodyPart) {
+			return getContent(bodyPart.getContent(), fileBackFun);
+		} else {
+			return "";
+		}
+	}
+
+	/**
+	 * 获取IMAP存储中所有叶子节点文件夹
+	 * 该方法会递归遍历IMAP存储的文件夹结构，获取所有最深层级的邮件文件夹（叶子节点）
+	 * 对于特定名称的文件夹（如垃圾邮件、草稿等）会跳过处理
+	 *
+	 * @param imapStore IMAP存储对象，包含邮件服务器的连接和文件夹结构
+	 * @return 包含所有叶子节点文件夹的列表，如果出现异常则返回空列表
+	 */
+	private List<Folder> getAllLeafNodeByImap(Store imapStore) {
+		try {
+			// 从默认文件夹开始递归获取所有叶子节点
+			return getAllLeafNode(imapStore.getDefaultFolder());
+		} catch (Exception e) {
+			// 出现异常时返回空列表，避免程序崩溃
+			return new ArrayList<>();
+		}
+	}
+
+	/**
+	 * 递归获取文件夹的所有叶子节点
+	 * 该方法会递归遍历文件夹结构，获取所有最深层级的邮件文件夹（叶子节点）
+	 * 对于特定名称的文件夹（如垃圾邮件、草稿等）会跳过处理
+	 *
+	 * @param folder 需要遍历的邮件文件夹
+	 * @return 包含所有叶子节点文件夹的列表
+	 * @throws Exception 当访问邮件文件夹时可能抛出的异常
+	 */
+	private List<Folder> getAllLeafNode(Folder folder) throws Exception {
+		// 获取当前文件夹的子文件夹列表
+		Folder[] list = folder.list();
+		if (list == null || list.length == 0) {
+			// 如果当前文件夹没有子文件夹，检查是否为需要跳过的文件夹类型
+			if (BREAK_FOLDER_NAME.contains(folder.getFullName())) {
+				return Collections.emptyList();
+			}
+			// 如果不是需要跳过的文件夹，则返回当前文件夹作为叶子节点
+			return Collections.singletonList(folder);
+		}
+		// 递归处理所有子文件夹
+		List<Folder> result = new LinkedList<>();
+		for (Folder item : list) {
+			result.addAll(getAllLeafNode(item));
+		}
+		return result;
 	}
 }

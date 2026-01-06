@@ -1,11 +1,14 @@
 package com.l7bug.message.domain.email;
 
 import com.l7bug.message.domain.email.record.EmailRecord;
+import jakarta.mail.Message;
+import jakarta.mail.Store;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * EmailGateway
@@ -34,4 +37,15 @@ public interface EmailConfigGateway {
 	void sendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息") @Validated(EmailValidGroups.Send.class) EmailRecord record, boolean canFileZip) throws Exception;
 
 	Optional<EmailConfig> findById(Long id);
+
+	/**
+	 * 拉取未读邮件消息
+	 * 该方法用于从指定的邮件配置中拉取未读邮件，并对每封邮件执行指定的消费者操作
+	 *
+	 * @param emailConfig 邮件配置对象，包含SMTP服务器信息和认证凭据
+	 * @param consumer    消费者函数，接收邮件记录和原始消息对象作为参数，用于处理每封未读邮件
+	 */
+	void pullNotReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息回调处理不能为空") BiConsumer<EmailRecord, Message> consumer);
+
+	Optional<Store> getImapStore(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig);
 }

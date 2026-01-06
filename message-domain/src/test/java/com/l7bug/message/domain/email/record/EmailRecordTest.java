@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmailRecordTest {
@@ -109,69 +107,5 @@ class EmailRecordTest {
 		Map<String, InputStream> expectedFiles = Map.of("file1", new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
 		emailRecord.setFiles(expectedFiles);
 		assertThat(emailRecord.getFiles()).isEqualTo(expectedFiles);
-	}
-
-	@Test
-	void testSendWithEmptyRecipients() {
-		emailRecord.setRecipients(List.of());
-
-		boolean result = emailRecord.send(emailConfig);
-
-		assertThat(result).isFalse();
-		verify(emailRecordGateway, never()).sendByConfig(any(), any());
-		verify(emailRecordGateway, never()).save(any());
-	}
-
-	@Test
-	void testSendSuccessfully() {
-		// 准备测试数据
-		emailRecord.setRecipients(List.of("recipient@example.com"));
-		emailRecord.setSubject("Test Subject");
-		emailRecord.setContent("Test content");
-		when(emailConfig.getUsername()).thenReturn("sender@example.com");
-		when(emailRecordGateway.sendByConfig(any(EmailRecord.class), any(EmailConfig.class))).thenReturn(true);
-		when(emailRecordGateway.save(any(EmailRecord.class))).thenReturn(true);
-
-		boolean result = emailRecord.send(emailConfig);
-
-		assertThat(result).isTrue();
-		verify(emailRecordGateway, times(1)).sendByConfig(any(EmailRecord.class), any(EmailConfig.class));
-		verify(emailRecordGateway, times(1)).save(any(EmailRecord.class));
-		assertThat(emailRecord.getReceivedDate()).isNotNull();
-		assertThat(emailRecord.getSentDate()).isNotNull();
-		assertThat(emailRecord.getFromAddress()).isEqualTo(List.of("sender@example.com"));
-	}
-
-	@Test
-	void testSendFailedToSend() {
-		// 准备测试数据
-		emailRecord.setRecipients(List.of("recipient@example.com"));
-		emailRecord.setSubject("Test Subject");
-		emailRecord.setContent("Test content");
-		when(emailConfig.getUsername()).thenReturn("sender@example.com");
-		when(emailRecordGateway.sendByConfig(any(EmailRecord.class), any(EmailConfig.class))).thenReturn(false);
-
-		boolean result = emailRecord.send(emailConfig);
-
-		assertThat(result).isFalse();
-		verify(emailRecordGateway, times(1)).sendByConfig(any(EmailRecord.class), any(EmailConfig.class));
-		verify(emailRecordGateway, never()).save(any(EmailRecord.class));
-	}
-
-	@Test
-	void testSendFailedToSave() {
-		// 准备测试数据
-		emailRecord.setRecipients(List.of("recipient@example.com"));
-		emailRecord.setSubject("Test Subject");
-		emailRecord.setContent("Test content");
-		when(emailConfig.getUsername()).thenReturn("sender@example.com");
-		when(emailRecordGateway.sendByConfig(any(EmailRecord.class), any(EmailConfig.class))).thenReturn(true);
-		when(emailRecordGateway.save(any(EmailRecord.class))).thenReturn(false);
-
-		boolean result = emailRecord.send(emailConfig);
-
-		assertThat(result).isFalse();
-		verify(emailRecordGateway, times(1)).sendByConfig(any(EmailRecord.class), any(EmailConfig.class));
-		verify(emailRecordGateway, times(1)).save(any(EmailRecord.class));
 	}
 }
