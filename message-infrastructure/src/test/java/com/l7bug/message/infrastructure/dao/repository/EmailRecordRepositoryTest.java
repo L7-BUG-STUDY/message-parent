@@ -40,9 +40,9 @@ class EmailRecordRepositoryTest {
 			entity.setType(Type.SEND.name());
 			entity.setFolder(FAKER.name().name());
 			entity.setSubject(FAKER.business().creditCardType());
-			entity.setFormAddress(List.of(FAKER.internet().emailAddress()));
+			entity.setFromAddress(List.of(FAKER.internet().emailAddress()));
 			entity.setRecipients(List.of(FAKER.internet().emailAddress(), FAKER.internet().emailAddress(), FAKER.internet().emailAddress()));
-			entity.setSendDate(FAKER.timeAndDate().past(10, TimeUnit.DAYS).atOffset(ZoneOffset.ofHours(8)));
+			entity.setSentDate(FAKER.timeAndDate().past(10, TimeUnit.DAYS).atOffset(ZoneOffset.ofHours(8)));
 			entity.setReceivedDate(OffsetDateTime.now());
 			entity.setContent(FAKER_CN.name().name());
 			entity.setFiles(Map.of(IdUtil.getSnowflakeNextIdStr(), fileName(), IdUtil.getSnowflakeNextIdStr(), fileName()));

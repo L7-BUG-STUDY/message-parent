@@ -1,8 +1,8 @@
 package com.l7bug.message.infrastructure.mapstruct;
 
-import com.l7bug.message.domain.email.EmailConfig;
-import com.l7bug.message.domain.email.EmailConfigGateway;
-import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
+import com.l7bug.message.domain.email.record.EmailRecord;
+import com.l7bug.message.domain.email.record.EmailRecordGateway;
+import com.l7bug.message.infrastructure.dao.dataobject.EmailRecordDo;
 import jakarta.annotation.Resource;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationContext;
  * @since 2025/12/23 15:44
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public abstract class EmailConfigDoMapstruct {
+public abstract class EmailRecordDoMapstruct {
 	@Resource
 	private ApplicationContext applicationContext;
 
@@ -28,8 +28,8 @@ public abstract class EmailConfigDoMapstruct {
 	 *
 	 * @return EmailConfig领域对象实例
 	 */
-	public EmailConfig createDomain() {
-		return new EmailConfig(applicationContext.getBean(EmailConfigGateway.class));
+	public EmailRecord createDomain() {
+		return new EmailRecord(applicationContext.getBean(EmailRecordGateway.class));
 	}
 
 	/**
@@ -39,14 +39,14 @@ public abstract class EmailConfigDoMapstruct {
 	 * @param emailConfig 邮件配置领域对象
 	 * @return EmailConfigDo数据对象
 	 */
-	public abstract EmailConfigDo mapDo(EmailConfig emailConfig);
+	public abstract EmailRecordDo mapDo(EmailRecord emailConfig);
 
 	/**
 	 * 将数据对象映射为领域对象
 	 * 将EmailConfigDo数据对象转换为EmailConfig领域对象，用于业务逻辑处理
 	 *
-	 * @param emailConfigDo 邮件配置数据对象
+	 * @param emailRecordDo 邮件配置数据对象
 	 * @return EmailConfig领域对象
 	 */
-	public abstract EmailConfig mapDomain(EmailConfigDo emailConfigDo);
+	public abstract EmailRecord mapDomain(EmailRecordDo emailRecordDo);
 }

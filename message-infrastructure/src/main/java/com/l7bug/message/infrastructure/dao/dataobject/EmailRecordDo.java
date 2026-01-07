@@ -37,17 +37,17 @@ public class EmailRecordDo extends BaseDo {
 	private String subject;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> formAddress;
+	private List<String> fromAddress;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<String> recipients;
 
-	private OffsetDateTime sendDate;
+	private OffsetDateTime sentDate;
 
 	private OffsetDateTime receivedDate;
 
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private Map<String, Object> files;
+	private Map<String, String> files;
 }

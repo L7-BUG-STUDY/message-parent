@@ -16,6 +16,7 @@ public enum EmailType {
 	 * 企业微信
 	 */
 	WX_WORK("imap.exmail.qq.com", 993, "smtp.exmail.qq.com", 465),
+	QQ("imap.qq.com", 993, "smtp.qq.com", 465),
 
 	;
 	private final String imapHost;

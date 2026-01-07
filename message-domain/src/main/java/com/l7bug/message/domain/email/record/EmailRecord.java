@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +23,7 @@ public class EmailRecord {
 	@Getter(AccessLevel.PRIVATE)
 	private final EmailRecordGateway emailRecordGateway;
 	private Long id;
+	private String messageId;
 	/**
 	 * 邮件记录类型
 	 */
@@ -48,11 +49,11 @@ public class EmailRecord {
 	/**
 	 * 发送时间
 	 */
-	private LocalDateTime sentDate;
+	private OffsetDateTime sentDate;
 	/**
 	 * 接收时间
 	 */
-	private LocalDateTime receivedDate;
+	private OffsetDateTime receivedDate;
 	/**
 	 * 内容
 	 */
@@ -64,5 +65,7 @@ public class EmailRecord {
 	 * key=文件id
 	 * value=文件名称
 	 */
-	private Map<String, InputStream> files = Map.of();
+	private Map<String, InputStream> sendFiles = Map.of();
+
+	private Map<String, String> files;
 }

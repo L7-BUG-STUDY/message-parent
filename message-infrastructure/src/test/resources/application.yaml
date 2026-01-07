@@ -28,3 +28,5 @@ spring:
 logging:
     level:
         root: info
+    file:
+        name: .logs/message-infrastructure-test.log

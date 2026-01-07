@@ -1,9 +1,12 @@
 package com.l7bug.message.infrastructure.gateway;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.ZipUtil;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
+import com.l7bug.message.domain.email.record.Type;
 import jakarta.mail.Store;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
@@ -76,7 +79,7 @@ class EmailConfigGatewayImplTest {
 				EmailRecord emailRecord = new EmailRecord(emailRecordGateway);
 				emailRecord.setSubject("测试");
 				emailRecord.setContent(content);
-				emailRecord.setFiles(Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS));
+				emailRecord.setSendFiles(Map.of("test.txt", log, "testEmail.html", htmlByteArrayIS, "uuids.txt", sbIS));
 				emailRecord.setRecipients(List.of("ll789y@gmail.com", "l7-bug@qq.com"));
 				boolean b = emailConfig.send(emailRecord, true);
 				assertThat(b).isTrue();
@@ -106,6 +109,7 @@ class EmailConfigGatewayImplTest {
 			return;
 		}
 		System.err.println(imapStore.get().getDefaultFolder());
+		System.err.println(imapStore.get());
 		imapStore.get().close();
 		System.err.println();
 	}
@@ -113,36 +117,30 @@ class EmailConfigGatewayImplTest {
 	@Test
 	@DisplayName("测试参数校验")
 	void testValidate() throws Exception {
-		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(new EmailConfig(this.emailConfigGateway), new EmailRecord(this.emailRecordGateway), true))
-			.message()
-			.isNotBlank()
-			.satisfies(log::info)
-			.as("测试邮件配置与邮件消息的参数都有问题")
-			.contains(
-				"邮箱类型不能为空",
-				"邮箱名不能为空",
-				"密码不能为空",
-				"邮件主题不能为空",
-				"邮件接收人不能为空",
-				"邮件内容不能为空"
-			);
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(new EmailConfig(this.emailConfigGateway), new EmailRecord(this.emailRecordGateway), true)).message().isNotBlank().satisfies(log::info).as("测试邮件配置与邮件消息的参数都有问题").contains("邮箱类型不能为空", "邮箱名不能为空", "密码不能为空", "邮件主题不能为空", "邮件接收人不能为空", "邮件内容不能为空");
 		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
 		if (byId.isEmpty()) {
 			return;
 		}
 		EmailRecord record = new EmailRecord(this.emailRecordGateway);
-		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(byId.get(), record, true))
-			.message()
-			.isNotBlank()
-			.satisfies(log::info)
-			.contains(
-				"邮件主题不能为空",
-				"邮件接收人不能为空",
-				"邮件内容不能为空"
-			);
-		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(null, null, false))
-			.message()
-			.isNotBlank()
-			.satisfies(log::info);
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(byId.get(), record, true)).message().isNotBlank().satisfies(log::info).contains("邮件主题不能为空", "邮件接收人不能为空", "邮件内容不能为空");
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(null, null, false)).message().isNotBlank().satisfies(log::info);
+	}
+
+	@Test
+	@DisplayName("测试拉取邮件")
+	void pullNotReadMessage() {
+		Optional<EmailConfig> byId = this.emailConfigGateway.findById(2008381848064966657L);
+		if (byId.isEmpty()) {
+			return;
+		}
+		this.emailConfigGateway.pullNotReadMessage(byId.get(), (record, message) -> {
+			record.setType(Type.RECEIVE);
+			byte[] bytes = record.getContent().getBytes(StandardCharsets.UTF_8);
+			byte[] gzip = ZipUtil.gzip(bytes);
+			log.info("[压缩]{}::{}.减少了{}%体积", bytes.length, gzip.length, (bytes.length - gzip.length) * 1D / bytes.length);
+			record.setContent(Base64.encode(gzip));
+			emailRecordGateway.save(record);
+		});
 	}
 }

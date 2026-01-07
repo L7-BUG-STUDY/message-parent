@@ -1,6 +1,7 @@
 package com.l7bug.message.infrastructure.gateway;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.l7bug.common.error.RemoteErrorCode;
@@ -11,9 +12,13 @@ import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
+import com.l7bug.message.infrastructure.mapstruct.EmailRecordDoMapstruct;
 import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.search.ComparisonTerm;
+import jakarta.mail.search.ReceivedDateTerm;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -26,8 +31,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -41,10 +52,13 @@ import java.util.zip.ZipOutputStream;
 @Component
 @AllArgsConstructor
 public class EmailConfigGatewayImpl implements EmailConfigGateway {
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	private static final Set<String> BREAK_FOLDER_NAME = new HashSet<>(Arrays.asList("Junk", "Drafts", "Deleted Messages", "Sent Messages"));
 	private final EmailConfigRepository emailConfigRepository;
 
 	private final EmailConfigDoMapstruct emailConfigDoMapstruct;
+
+	private final EmailRecordDoMapstruct emailRecordDoMapstruct;
 
 	public JavaMailSenderImpl buildSender(EmailConfig emailConfig) {
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
@@ -117,13 +131,13 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		// 第二个参数 true 表示发送的是 HTML，如果是 false 则会被当做纯文本显示 HTML 源码
 		helper.setText(record.getContent(), true);
 
-		if (!record.getFiles().isEmpty()) {
+		if (!record.getSendFiles().isEmpty()) {
 			// 4. 添加附件
 			if (canFileZip) {
 				try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 					 ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream, StandardCharsets.UTF_8)) {
 					zipOutputStream.setLevel(9);
-					for (Map.Entry<String, InputStream> entry : record.getFiles().entrySet()) {
+					for (Map.Entry<String, InputStream> entry : record.getSendFiles().entrySet()) {
 						String fileName = entry.getKey();
 						InputStream is = entry.getValue();
 						try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(is.readAllBytes())) {
@@ -138,7 +152,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 					helper.addAttachment(encodedFileName, new ByteArrayResource(byteArrayOutputStream.toByteArray()));
 				}
 			} else {
-				for (Map.Entry<String, InputStream> entry : record.getFiles().entrySet()) {
+				for (Map.Entry<String, InputStream> entry : record.getSendFiles().entrySet()) {
 					String fileName = entry.getKey();
 					InputStream is = entry.getValue();
 					helper.addAttachment(fileName, new ByteArrayResource(is.readAllBytes()));
@@ -152,7 +166,93 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 
 	@Override
 	public void pullNotReadMessage(EmailConfig emailConfig, BiConsumer<EmailRecord, Message> consumer) {
+		Optional<Store> imapStore = getImapStore(emailConfig);
+		if (imapStore.isEmpty()) {
+			return;
+		}
+		Store store = imapStore.get();
+		List<Folder> allLeafNodeByImap = this.getAllLeafNodeByImap(store);
 
+		for (Folder item : allLeafNodeByImap) {
+			try (Folder folder = item) {
+				String folderFullName = folder.getFullName();
+				// 创建线程池执行器，用于并发处理邮件
+				try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+					// 打开邮件文件夹进行读写操作
+					folder.open(Folder.READ_WRITE);
+					// 根据搜索条件查找邮件
+					Message[] messages = folder.search(new ReceivedDateTerm(ComparisonTerm.GE, new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24)));
+					/*if (messages.length == 0) {
+						continue;
+					}
+					messages = new Message[]{messages[0]};*/
+					final int messageLength = messages.length;
+					int index = 0;
+					for (final Message message : messages) {
+						final int finalIndex = index++;
+						executorService.execute(() -> {
+							log.info("[{}]::开始处理第[{}/{}]条数据", folderFullName, finalIndex, messageLength);
+							try {
+								// 创建邮件消息副本以避免并发问题
+								Message copyMimeMessage = message;
+								if (message instanceof MimeMessage) {
+									copyMimeMessage = new MimeMessage((MimeMessage) message);
+								}
+								String[] messageId = copyMimeMessage.getHeader("Message-ID");
+								// 读取邮件内容以及附件
+								Map<String, byte[]> files = new LinkedHashMap<>();
+								String content = getContent(copyMimeMessage.getContent(), files::put);
+								// 构建邮件信息数据传输对象
+								EmailRecord domain = emailRecordDoMapstruct.createDomain();
+								if (messageId.length > 0) {
+									domain.setMessageId(messageId[0]);
+								}
+								domain.setFolder(folderFullName);
+								domain.setSubject(copyMimeMessage.getSubject());
+								domain.setFromAddress(
+									Arrays.stream(message.getFrom())
+										.filter(temp -> temp instanceof InternetAddress)
+										.map(temp -> (InternetAddress) temp)
+										.map(InternetAddress::getAddress)
+										.toList()
+								);
+								domain.setRecipients(
+									Arrays.stream(message.getRecipients(Message.RecipientType.TO))
+										.filter(temp -> temp instanceof InternetAddress)
+										.map(temp -> (InternetAddress) temp)
+										.map(InternetAddress::getAddress)
+										.toList()
+								);
+								domain.setSentDate(message.getSentDate().toInstant().atZone(ZoneId.of("Asia/Shanghai")).toOffsetDateTime());
+								domain.setReceivedDate(message.getReceivedDate().toInstant().atZone(ZoneId.of("Asia/Shanghai")).toOffsetDateTime());
+								domain.setContent(content);
+								domain.setFiles(files.keySet().stream().collect(Collectors.toMap(temp -> IdUtil.getSnowflakeNextIdStr(), temp -> temp)));
+								// 回调处理
+								consumer.accept(domain, message);
+								log.info("第[{}/{}]条数据处理成功", finalIndex, messageLength);
+							} catch (Exception e) {
+								log.error("第[{}/{}]条数据处理失败", finalIndex, messageLength);
+								log.error("", e);
+							}
+						});
+					}
+					// 关闭线程池并等待所有任务完成
+					executorService.shutdown();
+					try {
+						if (!executorService.awaitTermination(3, TimeUnit.HOURS)) {
+							log.warn("[{}]::文件夹读取超时，仍有任务未完成", folderFullName);
+						} else {
+							log.info("[{}]::文件夹读取完成，所有邮件处理完毕", folderFullName);
+						}
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						log.error("[{}]::等待线程池终止时被中断", folderFullName, e);
+					}
+				}
+			} catch (MessagingException e) {
+				log.error("处理邮件文件夹时发生异常，文件夹: {}", item.getFullName(), e);
+			}
+		}
 	}
 
 	@Override
