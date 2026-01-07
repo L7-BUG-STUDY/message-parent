@@ -37,16 +37,16 @@ class EmailRecordRepositoryTest {
 	@Test
 	void test() {
 		List<EmailRecordDo> entities = new ArrayList<>(10);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 100; i++) {
 			EmailRecordDo entity = new EmailRecordDo();
 			entity.setType(Type.SEND.name());
-			entity.setFolder("测试文件夹");
+			entity.setFolder(FAKER.name().name());
 			entity.setSubject(FAKER.business().creditCardType());
-			entity.setFormAddress(List.of(FAKER.internet().emailAddress(), FAKER.internet().emailAddress(), FAKER.internet().emailAddress()));
-			entity.setRecipients(List.of(FAKER.internet().emailAddress(), FAKER.internet().emailAddress(), FAKER.internet().emailAddress(), FAKER.internet().emailAddress()));
+			entity.setFormAddress(List.of(FAKER.internet().emailAddress()));
+			entity.setRecipients(List.of(FAKER.internet().emailAddress(), FAKER.internet().emailAddress(), FAKER.internet().emailAddress()));
 			entity.setSendDate(FAKER.timeAndDate().past(10, TimeUnit.DAYS).atOffset(ZoneOffset.ofHours(8)));
 			entity.setReceivedDate(OffsetDateTime.now());
-			entity.setContent("setContent");
+			entity.setContent(FAKER_CN.name().name());
 			entity.setFiles(Map.of(IdUtil.getSnowflakeNextIdStr(), fileName(), IdUtil.getSnowflakeNextIdStr(), fileName()));
 			entities.add(entity);
 		}
