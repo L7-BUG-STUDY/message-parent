@@ -7,7 +7,6 @@ import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
 import com.l7bug.message.domain.email.record.Type;
-import jakarta.mail.Store;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.assertj.core.api.Assertions;
@@ -97,21 +96,14 @@ class EmailConfigGatewayImplTest {
 	}
 
 	@Test
-	void getImapStore() throws Exception {
+	void getImapStore() {
 		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
 		assertThat(byId).isNotNull();
 		if (byId.isEmpty()) {
 			return;
 		}
 		EmailConfig emailConfig = byId.get();
-		Optional<Store> imapStore = this.emailConfigGateway.getImapStore(emailConfig);
-		if (imapStore.isEmpty()) {
-			return;
-		}
-		System.err.println(imapStore.get().getDefaultFolder());
-		System.err.println(imapStore.get());
-		imapStore.get().close();
-		System.err.println();
+		Assertions.assertThat(emailConfig.testConnection()).isPresent();
 	}
 
 	@Test
@@ -129,12 +121,12 @@ class EmailConfigGatewayImplTest {
 
 	@Test
 	@DisplayName("测试拉取邮件")
-	void pullNotReadMessage() {
+	void pullAllReadMessage() {
 		Optional<EmailConfig> byId = this.emailConfigGateway.findById(2008381848064966657L);
 		if (byId.isEmpty()) {
 			return;
 		}
-		this.emailConfigGateway.pullNotReadMessage(byId.get(), (record, message) -> {
+		this.emailConfigGateway.pullAllReadMessage(byId.get(), record -> {
 			record.setType(Type.RECEIVE);
 			byte[] bytes = record.getContent().getBytes(StandardCharsets.UTF_8);
 			byte[] gzip = ZipUtil.gzip(bytes);

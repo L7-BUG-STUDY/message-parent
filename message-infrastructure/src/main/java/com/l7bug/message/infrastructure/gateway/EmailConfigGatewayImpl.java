@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -164,8 +165,9 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		javaMailSender.send(message);
 	}
 
+
 	@Override
-	public void pullNotReadMessage(EmailConfig emailConfig, BiConsumer<EmailRecord, Message> consumer) {
+	public void pullAllReadMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
 		Optional<Store> imapStore = getImapStore(emailConfig);
 		if (imapStore.isEmpty()) {
 			return;
@@ -228,7 +230,7 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 								domain.setContent(content);
 								domain.setFiles(files.keySet().stream().collect(Collectors.toMap(temp -> IdUtil.getSnowflakeNextIdStr(), temp -> temp)));
 								// 回调处理
-								consumer.accept(domain, message);
+								consumer.accept(domain);
 								log.info("第[{}/{}]条数据处理成功", finalIndex, messageLength);
 							} catch (Exception e) {
 								log.error("第[{}/{}]条数据处理失败", finalIndex, messageLength);
@@ -255,8 +257,25 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		}
 	}
 
+
 	@Override
-	public Optional<Store> getImapStore(EmailConfig emailConfig) {
+	public void pullLastThreeDaysAllReadMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
+
+	}
+
+
+	@Override
+	public void pullSendMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
+
+	}
+
+
+	@Override
+	public void pullLastThreeDaysSendMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
+
+	}
+
+	private Optional<Store> getImapStore(EmailConfig emailConfig) {
 		emailConfig.testConnection();
 		if (!emailConfig.getConnection()) {
 			return Optional.empty();

@@ -1,14 +1,12 @@
 package com.l7bug.message.domain.email;
 
 import com.l7bug.message.domain.email.record.EmailRecord;
-import jakarta.mail.Message;
-import jakarta.mail.Store;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * EmailGateway
@@ -42,13 +40,40 @@ public interface EmailConfigGateway {
 	Optional<EmailConfig> findById(Long id);
 
 	/**
-	 * 拉取未读邮件消息
-	 * 该方法用于从指定的邮件配置中拉取未读邮件，并对每封邮件执行指定的消费者操作
+	 * 拉取所有收件邮件
+	 * 该方法连接到指定的邮件配置，检索所有邮件文件夹中的已读邮件，并通过消费者函数处理每封邮件
+	 * 使用虚拟线程池并发处理邮件，提高处理效率
 	 *
-	 * @param emailConfig 邮件配置对象，包含SMTP服务器信息和认证凭据
-	 * @param consumer    消费者函数，接收邮件记录和原始消息对象作为参数，用于处理每封未读邮件
+	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
+	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
 	 */
-	void pullNotReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息回调处理不能为空") BiConsumer<EmailRecord, Message> consumer);
+	void pullAllReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
 
-	Optional<Store> getImapStore(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig);
+	/**
+	 * 拉取近三天所有收件邮件
+	 * 该方法连接到指定的邮件配置，检索所有邮件文件夹中的已读邮件，并通过消费者函数处理每封邮件
+	 * 使用虚拟线程池并发处理邮件，提高处理效率
+	 *
+	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
+	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
+	 */
+	void pullLastThreeDaysAllReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
+
+	/**
+	 * 拉取已发送的邮件
+	 * 该方法连接到指定的邮件配置，检索已发送的邮件，并通过消费者函数处理每封邮件
+	 *
+	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
+	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
+	 */
+	void pullSendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
+
+	/**
+	 * 拉取最近三天内已发送的邮件
+	 * 该方法连接到指定的邮件配置，检索最近三天内发送的邮件，并通过消费者函数处理每封邮件
+	 *
+	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
+	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
+	 */
+	void pullLastThreeDaysSendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
 }
