@@ -6,6 +6,9 @@ import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
 import jakarta.mail.Store;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +21,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 class EmailConfigGatewayImplTest {
 	private final Faker faker = new Faker(Locale.CHINA);
@@ -103,5 +107,41 @@ class EmailConfigGatewayImplTest {
 		System.err.println(imapStore.get().getDefaultFolder());
 		imapStore.get().close();
 		System.err.println();
+	}
+
+	@Test
+	@DisplayName("测试参数校验")
+	void testValidate() throws Exception {
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(new EmailConfig(this.emailConfigGateway), new EmailRecord(this.emailRecordGateway), true))
+			.message()
+			.isNotBlank()
+			.satisfies(log::info)
+			.as("测试邮件配置与邮件消息的参数都有问题")
+			.contains(
+				"邮箱类型不能为空",
+				"邮箱名不能为空",
+				"密码不能为空",
+				"邮件主题不能为空",
+				"邮件接收人不能为空",
+				"邮件内容不能为空"
+			);
+		Optional<EmailConfig> byId = this.emailConfigGateway.findById(1L);
+		if (byId.isEmpty()) {
+			return;
+		}
+		EmailRecord record = new EmailRecord(this.emailRecordGateway);
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(byId.get(), record, true))
+			.message()
+			.isNotBlank()
+			.satisfies(log::info)
+			.contains(
+				"邮件主题不能为空",
+				"邮件接收人不能为空",
+				"邮件内容不能为空"
+			);
+		Assertions.assertThatThrownBy(() -> this.emailConfigGateway.sendMessage(null, null, false))
+			.message()
+			.isNotBlank()
+			.satisfies(log::info);
 	}
 }

@@ -34,7 +34,10 @@ public interface EmailConfigGateway {
 	 */
 	Optional<String> testConnection(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig);
 
-	void sendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull(message = "邮件消息") @Validated(EmailValidGroups.Send.class) EmailRecord record, boolean canFileZip) throws Exception;
+	@Validated(EmailValidGroups.Send.class)
+	void sendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig,
+					 @NotNull(message = "邮件消息不能为空") @Valid EmailRecord record,
+					 boolean canFileZip) throws Exception;
 
 	Optional<EmailConfig> findById(Long id);
 

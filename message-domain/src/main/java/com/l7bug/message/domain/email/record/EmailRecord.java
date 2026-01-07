@@ -44,7 +44,7 @@ public class EmailRecord {
 	 * 接收人
 	 */
 	@NotEmpty(message = "邮件接收人不能为空", groups = EmailValidGroups.Send.class)
-	private List<String> recipients;
+	private List<String> recipients = List.of();
 	/**
 	 * 发送时间
 	 */
