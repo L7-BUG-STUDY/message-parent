@@ -8,7 +8,7 @@ create table message_email_record
     subject       varchar(256)             not null,
     from_address  jsonb                    not null,
     recipients    jsonb                    not null,
-    send_date     timestamp with time zone not null,
+    sent_date     timestamp with time zone not null,
     received_date timestamp with time zone not null,
     content       text                     not null,
     files         jsonb                    not null,
@@ -32,7 +32,7 @@ comment on column message_email_record.from_address is '发送人json字符串�
 
 comment on column message_email_record.recipients is '接收人json字符串数组';
 
-comment on column message_email_record.send_date is '发送时间';
+comment on column message_email_record.sent_date is '发送时间';
 
 comment on column message_email_record.received_date is '接收时间';
 
