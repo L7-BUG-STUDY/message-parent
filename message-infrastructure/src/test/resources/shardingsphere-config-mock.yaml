@@ -10,6 +10,24 @@ rules:
         tables:
             - master.public.*
         defaultDataSource: master # 默认数据源，仅在执行 CREATE TABLE 创建单表时有效。缺失值为空，表示随机单播路由。
+    - !SHARDING
+        tables:
+            message_email_record:
+                actualDataNodes: master.message_email_record_${2024..2040}${['01','02','03','04','05','06','07','08','09','10','11','12']}
+                tableStrategy:
+                    standard:
+                        shardingColumn: received_date
+                        shardingAlgorithmName: month_algo
+        shardingAlgorithms:
+            month_algo:
+                type: INTERVAL
+                props:
+                    datetime-pattern: "yyyy-MM-dd HH:mm:ss"
+                    datetime-lower: "2024-01-01 00:00:00"
+                    datetime-upper: "2040-12-31 00:00:00"
+                    sharding-suffix-pattern: "_yyyyMM"
+                    datetime-interval-amount: 1
+                    datetime-interval-unit: "MONTHS"
 
 props:
     sql-show: true

@@ -1,12 +1,12 @@
 package com.l7bug.message.infrastructure.gateway;
 
-import com.github.javafaker.Faker;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
 import jakarta.mail.Store;
 import lombok.extern.slf4j.Slf4j;
+import net.datafaker.Faker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 class EmailConfigGatewayImplTest {
-	private final Faker faker = new Faker(Locale.CHINA);
+	private final Faker fakerCn = new Faker(Locale.CHINA);
+	private final Faker faker = new Faker();
 	@Autowired
 	private EmailConfigGatewayImpl emailConfigGateway;
 
@@ -88,7 +89,7 @@ class EmailConfigGatewayImplTest {
 		EmailConfig emailConfig = new EmailConfig(emailConfigGateway);
 		emailConfig.setType(EmailType.WX_WORK);
 		emailConfig.setUsername(faker.internet().safeEmailAddress());
-		emailConfig.setPassword(faker.internet().password());
+		emailConfig.setPassword(faker.credentials().password());
 		emailConfig.save();
 	}
 
