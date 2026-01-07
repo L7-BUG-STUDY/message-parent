@@ -28,6 +28,8 @@ public class EmailRecordDo extends BaseDo {
 	@Serial
 	private static final long serialVersionUID = -342773148603870688L;
 
+	private String messageId;
+
 	private String type;
 
 	private String folder;

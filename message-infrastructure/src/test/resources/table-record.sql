@@ -3,6 +3,7 @@ create table message_email_record
 (
     id            bigint                   not null
         primary key,
+    message_id    varchar(256)             not null,
     type          varchar(8)               not null,
     folder        varchar(64)              not null,
     subject       varchar(256)             not null,
@@ -38,4 +39,9 @@ comment on column message_email_record.received_date is '接收时间';
 comment on column message_email_record.content is '内容';
 
 comment on column message_email_record.files is '附件信息json';
+
+comment on column message_email_record.message_id is '邮件Id';
+
+create unique index
+    on message_email_record (message_id);
 

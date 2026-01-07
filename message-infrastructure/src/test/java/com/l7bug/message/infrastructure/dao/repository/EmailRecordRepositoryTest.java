@@ -13,10 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
@@ -36,9 +33,10 @@ class EmailRecordRepositoryTest {
 
 	@Test
 	void test() {
-		List<EmailRecordDo> entities = new ArrayList<>(10);
+		List<EmailRecordDo> entities = new ArrayList<>(100);
 		for (int i = 0; i < 100; i++) {
 			EmailRecordDo entity = new EmailRecordDo();
+			entity.setMessageId(UUID.randomUUID().toString());
 			entity.setType(Type.SEND.name());
 			entity.setFolder(FAKER.name().name());
 			entity.setSubject(FAKER.business().creditCardType());
