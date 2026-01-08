@@ -1,6 +1,7 @@
 package com.l7bug.message.infrastructure.gateway;
 
 import com.l7bug.message.domain.email.sync.EmailSyncState;
+import com.l7bug.message.domain.email.sync.EmailSyncStateGateway;
 import com.l7bug.message.infrastructure.mapstruct.EmailSyncStateDoMapstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 @Slf4j
 @SpringBootTest
 class EmailSyncStateGatewayImplTest {
@@ -18,6 +21,9 @@ class EmailSyncStateGatewayImplTest {
 	private final Faker faker = new Faker();
 	@Autowired
 	private EmailSyncStateDoMapstruct emailSyncStateDoMapstruct;
+
+	@Autowired
+	private EmailSyncStateGateway emailSyncStateGateway;
 	private EmailSyncState domain;
 
 	@BeforeEach
@@ -48,5 +54,14 @@ class EmailSyncStateGatewayImplTest {
 		domain.setUsername(faker.internet().emailAddress());
 		domain.save();
 		Assertions.assertThat(domain.getId()).isEqualTo(id);
+		Optional<EmailSyncState> last = emailSyncStateGateway.findLast(domain.getUsername(), domain.getFolder(), domain.getUidValidity());
+		Assertions.assertThat(last)
+			.isPresent()
+			.get()
+			.satisfies(temp -> log.info("last: {}", temp))
+			.isEqualTo(domain)
+			.extracting(EmailSyncState::getId)
+			.isEqualTo(id)
+		;
 	}
 }

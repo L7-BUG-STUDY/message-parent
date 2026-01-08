@@ -4,6 +4,8 @@ import com.l7bug.message.infrastructure.dao.dataobject.EmailSyncStateDo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * EmailSyncStateRepository
  *
@@ -12,4 +14,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface EmailSyncStateRepository extends JpaRepository<EmailSyncStateDo, Long> {
+	Optional<EmailSyncStateDo> findFirstByUsernameAndFolderAndUidValidityOrderById(String username, String folder, Long uidValidity);
 }

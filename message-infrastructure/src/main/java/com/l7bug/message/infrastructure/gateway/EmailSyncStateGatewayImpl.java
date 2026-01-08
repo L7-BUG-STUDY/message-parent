@@ -8,6 +8,8 @@ import com.l7bug.message.infrastructure.mapstruct.EmailSyncStateDoMapstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * EmailSyncStateGatewayImpl
  *
@@ -26,5 +28,12 @@ public class EmailSyncStateGatewayImpl implements EmailSyncStateGateway {
 		emailSyncStateRepository.save(entity);
 		save.setId(entity.getId());
 		return true;
+	}
+
+	@Override
+	public Optional<EmailSyncState> findLast(String username, String folder, Long uidValidity) {
+		return this.emailSyncStateRepository
+			.findFirstByUsernameAndFolderAndUidValidityOrderById(username, folder, uidValidity)
+			.map(emailSyncStateDoMapstruct::mapDomain);
 	}
 }
