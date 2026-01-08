@@ -5,6 +5,12 @@ dataSources:
         jdbcUrl: jdbc:postgresql://localhost:35432/message-mock?TimeZone=Asia/Shanghai&stringtype=unspecified
         username: admin
         password: 123456
+    sharding:
+        dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+        driverClassName: org.postgresql.Driver
+        jdbcUrl: jdbc:postgresql://localhost:35432/message-sharding?TimeZone=Asia/Shanghai&stringtype=unspecified
+        username: admin
+        password: 123456
 rules:
     - !SINGLE
         tables:
@@ -13,7 +19,7 @@ rules:
     - !SHARDING
         tables:
             message_email_record:
-                actualDataNodes: master.message_email_record_${2024..2040}${['01','02','03','04','05','06','07','08','09','10','11','12']}
+                actualDataNodes: sharding.message_email_record_${2024..2040}${['01','02','03','04','05','06','07','08','09','10','11','12']}
                 tableStrategy:
                     standard:
                         shardingColumn: received_date
