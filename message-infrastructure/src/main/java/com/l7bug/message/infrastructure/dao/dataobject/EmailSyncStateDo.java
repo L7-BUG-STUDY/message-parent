@@ -22,7 +22,7 @@ import java.io.Serial;
 @Setter
 @Entity
 @Table(name = "message_email_sync_state")
-public class EmailSyncState extends BaseNotDeleDo {
+public class EmailSyncStateDo extends BaseNotDeleDo {
 	@Serial
 	private static final long serialVersionUID = -2388760983835729158L;
 	@Size(max = 64)
