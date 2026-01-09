@@ -58,7 +58,7 @@ class EmailSyncStateGatewayImplTest {
 		Assertions.assertThat(last)
 			.isPresent()
 			.get()
-			.satisfies(temp -> log.info("last: {}", temp))
+			.satisfies(temp -> log.info("find: {}", temp))
 			.isEqualTo(domain)
 			.extracting(EmailSyncState::getId)
 			.isEqualTo(id)
