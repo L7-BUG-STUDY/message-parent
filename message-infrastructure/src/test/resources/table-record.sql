@@ -3,6 +3,7 @@ create table message_email_record
 (
     id            bigint                   not null
         primary key,
+    message_id    varchar(256)             not null,
     type          varchar(8)               not null,
     folder        varchar(64)              not null,
     subject       varchar(256)             not null,
@@ -16,8 +17,7 @@ create table message_email_record
     update_by     bigint,
     create_time   timestamp with time zone,
     update_time   timestamp with time zone,
-    del_flag      boolean,
-    message_id    varchar(256)             not null
+    del_flag      boolean
 );
 
 comment on table message_email_record is '邮件记录';
@@ -42,7 +42,7 @@ comment on column message_email_record.files is '附件信息json';
 
 comment on column message_email_record.message_id is '邮件Id';
 
-create index
+create unique index
     on message_email_record (message_id);
 
 create index
