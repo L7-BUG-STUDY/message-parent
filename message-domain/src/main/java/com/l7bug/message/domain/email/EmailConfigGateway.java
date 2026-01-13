@@ -48,32 +48,4 @@ public interface EmailConfigGateway {
 	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
 	 */
 	void pullAllReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
-
-	/**
-	 * 拉取近三天所有收件邮件
-	 * 该方法连接到指定的邮件配置，检索所有邮件文件夹中的已读邮件，并通过消费者函数处理每封邮件
-	 * 使用虚拟线程池并发处理邮件，提高处理效率
-	 *
-	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
-	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
-	 */
-	void pullLastThreeDaysAllReadMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
-
-	/**
-	 * 拉取已发送的邮件
-	 * 该方法连接到指定的邮件配置，检索已发送的邮件，并通过消费者函数处理每封邮件
-	 *
-	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
-	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
-	 */
-	void pullSendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
-
-	/**
-	 * 拉取最近三天内已发送的邮件
-	 * 该方法连接到指定的邮件配置，检索最近三天内发送的邮件，并通过消费者函数处理每封邮件
-	 *
-	 * @param emailConfig 邮件配置对象，包含连接邮件服务器所需的信息，如用户名、密码、服务器地址等
-	 * @param consumer    消费者函数，用于处理拉取到的每一封邮件记录，接收EmailRecord类型的参数
-	 */
-	void pullLastThreeDaysSendMessage(@NotNull(message = "邮件配置不能为空") @Valid EmailConfig emailConfig, @NotNull Consumer<EmailRecord> consumer);
 }

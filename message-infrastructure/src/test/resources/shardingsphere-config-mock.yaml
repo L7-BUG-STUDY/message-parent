@@ -19,7 +19,7 @@ rules:
     - !SHARDING
         tables:
             message_email_record:
-                actualDataNodes: sharding.message_email_record_${2024..2040}${['01','02','03','04','05','06','07','08','09','10','11','12']}
+                actualDataNodes: sharding.message_email_record_${2000..2040}${['01','02','03','04','05','06','07','08','09','10','11','12']}
                 tableStrategy:
                     standard:
                         shardingColumn: received_date
@@ -29,7 +29,7 @@ rules:
                 type: INTERVAL
                 props:
                     datetime-pattern: "yyyy-MM-dd HH:mm:ss"
-                    datetime-lower: "2024-01-01 00:00:00"
+                    datetime-lower: "2000-01-01 00:00:00"
                     datetime-upper: "2040-12-31 00:00:00"
                     sharding-suffix-pattern: "_yyyyMM"
                     datetime-interval-amount: 1

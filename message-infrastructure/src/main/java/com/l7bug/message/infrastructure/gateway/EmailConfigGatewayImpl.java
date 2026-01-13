@@ -1,7 +1,6 @@
 package com.l7bug.message.infrastructure.gateway;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.l7bug.common.error.RemoteErrorCode;
@@ -9,16 +8,18 @@ import com.l7bug.common.exception.RemoteException;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailConfigGateway;
 import com.l7bug.message.domain.email.record.EmailRecord;
+import com.l7bug.message.domain.email.record.Type;
+import com.l7bug.message.domain.email.sync.EmailSyncState;
+import com.l7bug.message.domain.email.sync.EmailSyncStateGateway;
 import com.l7bug.message.infrastructure.dao.dataobject.EmailConfigDo;
 import com.l7bug.message.infrastructure.dao.repository.EmailConfigRepository;
 import com.l7bug.message.infrastructure.mapstruct.EmailConfigDoMapstruct;
 import com.l7bug.message.infrastructure.mapstruct.EmailRecordDoMapstruct;
+import com.l7bug.message.infrastructure.mapstruct.EmailSyncStateDoMapstruct;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
-import jakarta.mail.search.ComparisonTerm;
-import jakarta.mail.search.ReceivedDateTerm;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -32,14 +33,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -60,6 +61,12 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 	private final EmailConfigDoMapstruct emailConfigDoMapstruct;
 
 	private final EmailRecordDoMapstruct emailRecordDoMapstruct;
+
+	private final EmailSyncStateGateway emailSyncStateGateway;
+
+	private final EmailSyncStateDoMapstruct emailSyncStateDoMapstruct;
+
+	private final int stepValue = 300;
 
 	public JavaMailSenderImpl buildSender(EmailConfig emailConfig) {
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
@@ -175,19 +182,30 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 		Store store = imapStore.get();
 		List<Folder> allLeafNodeByImap = this.getAllLeafNodeByImap(store);
 
-		for (Folder item : allLeafNodeByImap) {
-			try (Folder folder = item) {
+		for (Folder folder : allLeafNodeByImap) {
+			try (folder) {
+				folder.open(Folder.READ_ONLY);
 				String folderFullName = folder.getFullName();
+				if (!(folder instanceof UIDFolder uidFolder)) {
+					continue;
+				}
+				long uidValidity = uidFolder.getUIDValidity();
+				Optional<EmailSyncState> last = this.emailSyncStateGateway.findLast(emailConfig.getUsername(), folderFullName, uidValidity);
+				EmailSyncState orElse = emailSyncStateDoMapstruct.createDomain();
+				orElse.setUsername(emailConfig.getUsername());
+				orElse.setFolder(folderFullName);
+				orElse.setUidValidity(uidValidity);
+				orElse.setUid(-1L);
+				EmailSyncState emailSyncState = last.orElse(orElse);
+				AtomicLong maxUid = new AtomicLong(emailSyncState.getUid());
 				// 创建线程池执行器，用于并发处理邮件
 				try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
 					// 打开邮件文件夹进行读写操作
-					folder.open(Folder.READ_WRITE);
 					// 根据搜索条件查找邮件
-					Message[] messages = folder.search(new ReceivedDateTerm(ComparisonTerm.GE, new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24)));
-					/*if (messages.length == 0) {
+					Message[] messages = uidFolder.getMessagesByUID(emailSyncState.getUid() + 1, emailSyncState.getUid() + stepValue);
+					if (messages.length == 0) {
 						continue;
 					}
-					messages = new Message[]{messages[0]};*/
 					final int messageLength = messages.length;
 					int index = 0;
 					for (final Message message : messages) {
@@ -196,21 +214,23 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 							log.info("[{}]::开始处理第[{}/{}]条数据", folderFullName, finalIndex, messageLength);
 							try {
 								// 创建邮件消息副本以避免并发问题
-								Message copyMimeMessage = message;
-								if (message instanceof MimeMessage) {
-									copyMimeMessage = new MimeMessage((MimeMessage) message);
-								}
-								String[] messageId = copyMimeMessage.getHeader("Message-ID");
+								// Message copyMimeMessage = message;
+								// if (message instanceof MimeMessage) {
+								// 	copyMimeMessage = new MimeMessage((MimeMessage) message);
+								// }
+								long uid = uidFolder.getUID(message);
+								String[] messageId = message.getHeader("Message-ID");
 								// 读取邮件内容以及附件
-								Map<String, byte[]> files = new LinkedHashMap<>();
-								String content = getContent(copyMimeMessage.getContent(), files::put);
+								// Map<String, byte[]> files = new LinkedHashMap<>();
+								// String content = getContent(message.getContent(), files::put);
 								// 构建邮件信息数据传输对象
 								EmailRecord domain = emailRecordDoMapstruct.createDomain();
-								if (messageId.length > 0) {
+								domain.setMessageId(UUID.randomUUID().toString());
+								if (messageId != null && messageId.length > 0) {
 									domain.setMessageId(messageId[0]);
 								}
 								domain.setFolder(folderFullName);
-								domain.setSubject(copyMimeMessage.getSubject());
+								domain.setSubject(message.getSubject());
 								domain.setFromAddress(
 									Arrays.stream(message.getFrom())
 										.filter(temp -> temp instanceof InternetAddress)
@@ -225,12 +245,24 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 										.map(InternetAddress::getAddress)
 										.toList()
 								);
-								domain.setSentDate(message.getSentDate().toInstant().atZone(ZoneId.of("Asia/Shanghai")).toOffsetDateTime());
 								domain.setReceivedDate(message.getReceivedDate().toInstant().atZone(ZoneId.of("Asia/Shanghai")).toOffsetDateTime());
-								domain.setContent(content);
-								domain.setFiles(files.keySet().stream().collect(Collectors.toMap(temp -> IdUtil.getSnowflakeNextIdStr(), temp -> temp)));
+								domain.setSentDate(
+									Optional.ofNullable(message.getSentDate())
+										.map(Date::toInstant)
+										.map(temp -> temp.atZone(ZoneId.of("Asia/Shanghai")))
+										.map(ZonedDateTime::toOffsetDateTime)
+										.orElse(domain.getReceivedDate())
+								);
+								if (domain.getFromAddress().contains(emailConfig.getUsername())) {
+									domain.setType(Type.SEND);
+								} else {
+									domain.setType(Type.RECEIVE);
+								}
+								domain.setContent("");
+								domain.setFiles(Map.of());
 								// 回调处理
 								consumer.accept(domain);
+								maxUid.getAndUpdate(currentMax -> Math.max(currentMax, uid));
 								log.info("第[{}/{}]条数据处理成功", finalIndex, messageLength);
 							} catch (Exception e) {
 								log.error("第[{}/{}]条数据处理失败", finalIndex, messageLength);
@@ -238,41 +270,13 @@ public class EmailConfigGatewayImpl implements EmailConfigGateway {
 							}
 						});
 					}
-					// 关闭线程池并等待所有任务完成
-					executorService.shutdown();
-					try {
-						if (!executorService.awaitTermination(3, TimeUnit.HOURS)) {
-							log.warn("[{}]::文件夹读取超时，仍有任务未完成", folderFullName);
-						} else {
-							log.info("[{}]::文件夹读取完成，所有邮件处理完毕", folderFullName);
-						}
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-						log.error("[{}]::等待线程池终止时被中断", folderFullName, e);
-					}
 				}
+				emailSyncState.setUid(maxUid.get());
+				emailSyncState.save();
 			} catch (MessagingException e) {
-				log.error("处理邮件文件夹时发生异常，文件夹: {}", item.getFullName(), e);
+				log.error("处理邮件文件夹时发生异常，文件夹: {}", folder.getFullName(), e);
 			}
 		}
-	}
-
-
-	@Override
-	public void pullLastThreeDaysAllReadMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
-
-	}
-
-
-	@Override
-	public void pullSendMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
-
-	}
-
-
-	@Override
-	public void pullLastThreeDaysSendMessage(EmailConfig emailConfig, Consumer<EmailRecord> consumer) {
-
 	}
 
 	private Optional<Store> getImapStore(EmailConfig emailConfig) {

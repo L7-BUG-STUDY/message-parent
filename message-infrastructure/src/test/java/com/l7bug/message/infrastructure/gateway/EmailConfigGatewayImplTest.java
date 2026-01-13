@@ -1,12 +1,9 @@
 package com.l7bug.message.infrastructure.gateway;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.ZipUtil;
 import com.l7bug.message.domain.email.EmailConfig;
 import com.l7bug.message.domain.email.EmailType;
 import com.l7bug.message.domain.email.record.EmailRecord;
 import com.l7bug.message.domain.email.record.EmailRecordGateway;
-import com.l7bug.message.domain.email.record.Type;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.assertj.core.api.Assertions;
@@ -33,6 +30,7 @@ class EmailConfigGatewayImplTest {
 
 	@Autowired
 	private EmailRecordGateway emailRecordGateway;
+
 
 	@Test
 	void testConnection() {
@@ -122,17 +120,16 @@ class EmailConfigGatewayImplTest {
 	@Test
 	@DisplayName("测试拉取邮件")
 	void pullAllReadMessage() {
-		Optional<EmailConfig> byId = this.emailConfigGateway.findById(2008381848064966657L);
+		Optional<EmailConfig> byId = this.emailConfigGateway.findById(2008381156596125697L);
 		if (byId.isEmpty()) {
 			return;
 		}
 		this.emailConfigGateway.pullAllReadMessage(byId.get(), record -> {
-			record.setType(Type.RECEIVE);
-			byte[] bytes = record.getContent().getBytes(StandardCharsets.UTF_8);
-			byte[] gzip = ZipUtil.gzip(bytes);
-			log.info("[压缩]{}::{}.减少了{}%体积", bytes.length, gzip.length, (bytes.length - gzip.length) * 1D / bytes.length);
-			record.setContent(Base64.encode(gzip));
-			emailRecordGateway.save(record);
+			try {
+				emailRecordGateway.save(record);
+			} catch (Exception e) {
+				log.error("e: ", e);
+			}
 		});
 	}
 }
