@@ -1,9 +1,16 @@
 package com.l7bug.consul;
 
+import cn.hutool.core.io.IoUtil;
+import com.l7bug.common.result.Result;
 import com.l7bug.consul.feign.DemoClient;
+import com.l7bug.file.client.RemoteFileService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * IndexController
@@ -16,8 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
 	private final DemoClient demoClient;
 
+	private final RemoteFileService remoteFileService;
+
 	@GetMapping
 	public String hello() {
-		return "hello world" + demoClient.emailProcess();
+		return "hello world" + remoteFileService.hello().getData();
+	}
+
+	@GetMapping("/image")
+	public void image(HttpServletResponse response) throws IOException {
+		Result<byte[]> download = this.remoteFileService.download(1L);
+		IoUtil.copy(new ByteArrayInputStream(download.getData()), response.getOutputStream());
 	}
 }
