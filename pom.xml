@@ -21,6 +21,8 @@
 		<module>config-server</module>
 		<module>config-client</module>
 		<module>aot-demo</module>
+		<module>consul-demo</module>
+		<module>consul-openfeign</module>
 	</modules>
 
 	<properties>

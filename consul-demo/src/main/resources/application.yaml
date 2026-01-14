@@ -1,0 +1,22 @@
+spring:
+    application:
+        name: consul-demo
+    cloud:
+        consul:
+            discovery:
+                health-check-critical-timeout: 30s
+                enabled: true
+                prefer-ip-address: true
+                instance-id: ${spring.application.name}:${random.uuid}
+            host: localhost
+            port: 18500
+            config:
+                enabled: true
+                format: yaml    # 支持 key/value 或 yaml 格式
+                data-key: data  # 如果使用 yaml 格式，这是对应的 key 名
+    config:
+        import:
+            - "optional:consul:localhost:18500/config/always-log/;format=yaml"
+            - "optional:consul:localhost:18500/config/demo/;format=yaml"
+server:
+    port: 0
