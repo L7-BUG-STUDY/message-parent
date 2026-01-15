@@ -15,4 +15,4 @@ server:
     port: 0
 logging:
     level:
-        root: debug
+        root: info

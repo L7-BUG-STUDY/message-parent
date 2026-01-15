@@ -1,7 +1,7 @@
 package com.l7bug.consul;
 
 
-import com.l7bug.consul.feign.FileClient;
+import com.l7bug.file.client.feign.FileClient;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
