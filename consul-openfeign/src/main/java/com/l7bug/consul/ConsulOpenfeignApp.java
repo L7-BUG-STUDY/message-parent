@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @since 2026/1/14 11:18
  */
 @EnableDiscoveryClient // 开启 Consul 服务发现
-@EnableFeignClients(basePackages = {"com.l7bug.consul.feign", "com.l7bug.file.client"})
+@EnableFeignClients(basePackages = {"com.l7bug.consul.feign"})
 @SpringBootApplication
 public class ConsulOpenfeignApp {
 	static void main() {

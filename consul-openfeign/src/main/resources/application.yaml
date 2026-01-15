@@ -1,9 +1,18 @@
 spring:
     application:
         name: consul-openfeign
+    threads:
+        virtual:
+            enabled: true
     cloud:
         consul:
             host: localhost
             port: 18500
+        openfeign:
+            circuitbreaker:
+                enabled: true
 server:
     port: 0
+logging:
+    level:
+        root: debug
