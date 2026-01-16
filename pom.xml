@@ -23,6 +23,7 @@
 		<module>aot-demo</module>
 		<module>consul-demo</module>
 		<module>consul-openfeign</module>
+		<module>gateway</module>
 	</modules>
 
 	<properties>

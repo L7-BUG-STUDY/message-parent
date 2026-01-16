@@ -1,0 +1,22 @@
+spring:
+    application:
+        name: gateway
+    threads:
+        virtual:
+            enabled: true
+    cloud:
+        consul:
+            host: localhost
+            port: 18500
+        gateway:
+            server:
+                webflux:
+                    discovery:
+                        locator:
+                            enabled: true
+                            lower-case-service-id: true
+server:
+    port: 10086
+logging:
+    level:
+        root: info
