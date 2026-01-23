@@ -27,6 +27,7 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -79,8 +80,10 @@ public class RequestLoggingFilter implements GlobalFilter, Ordered {
 		if (canAuth) {
 			String first = exchange.getRequest().getHeaders().getFirst(Headers.TOKEN);
 			HashOperations<String, Object, Object> stringObjectObjectHashOperations = this.stringRedisTemplate.opsForHash();
-			Map<Object, Object> entries = stringObjectObjectHashOperations.entries("system:user:token:" + first);
+			String authKey = "system:user:token:" + first;
+			Map<Object, Object> entries = stringObjectObjectHashOperations.entries(authKey);
 			if (!entries.isEmpty()) {
+				this.stringRedisTemplate.expire(authKey, 2, TimeUnit.HOURS);
 				Object username = entries.getOrDefault("username", "");
 				requestBuild.header(Headers.USERNAME, username.toString());
 				requestBuild.header(Headers.AUTHORITIES, entries.getOrDefault("authorities", "").toString());
