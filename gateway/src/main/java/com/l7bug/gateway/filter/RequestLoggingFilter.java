@@ -84,8 +84,10 @@ public class RequestLoggingFilter implements GlobalFilter, Ordered {
 			Map<Object, Object> entries = stringObjectObjectHashOperations.entries(authKey);
 			if (!entries.isEmpty()) {
 				this.stringRedisTemplate.expire(authKey, 2, TimeUnit.HOURS);
-				Object username = entries.getOrDefault("username", "");
-				requestBuild.header(Headers.USERNAME, username.toString());
+				String username = entries.getOrDefault("username", "").toString();
+				String userId = entries.getOrDefault("id", "").toString();
+				requestBuild.header(Headers.USERNAME, username);
+				requestBuild.header(Headers.USER_ID, userId);
 				requestBuild.header(Headers.AUTHORITIES, entries.getOrDefault("authorities", "").toString());
 			} else {
 				log.warn("用户未登录");
