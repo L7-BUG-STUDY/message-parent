@@ -55,7 +55,7 @@ public class RequestLoggingFilter implements GlobalFilter, Ordered {
 		requestId.set(exchange.getRequest().getHeaders().getFirst(Headers.REQUEST_ID));
 		String requestIdAttributes = exchange.getAttributes().getOrDefault(Headers.REQUEST_ID, "").toString();
 		ServerHttpRequest.Builder requestBuild = exchange.getRequest().mutate();
-		if (!StringUtils.hasText(requestId.get()) || !StringUtils.hasText(requestIdAttributes)) {
+		if (!StringUtils.hasText(requestId.get()) && !StringUtils.hasText(requestIdAttributes)) {
 			String uuid = UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
 			requestId.set(uuid);
 			requestBuild.header(Headers.REQUEST_ID, requestId.get());
